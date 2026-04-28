@@ -1,0 +1,80 @@
+================================================================================
+                   GoTrip Pro — MongoDB Atlas Connection Fix
+================================================================================
+
+PROBLEM:
+--------
+Error: querySrv ECONNREFUSED _mongodb._tcp.gotrip.ryf8l7t.mongodb.net
+
+This means your computer's DNS (provided by your ISP — Jio, Airtel, BSNL, etc.)
+cannot resolve MongoDB Atlas SRV records. This is a very common issue in India.
+Your local MongoDB Compass works because it uses localhost, not DNS.
+
+
+WHAT I FIXED (Code Changes):
+-----------------------------
+1. server/config/db.js
+   - Added: dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1'])
+   - This forces Node.js to use Google/Cloudflare public DNS instead of your ISP's DNS
+   - I verified this works — all 3 Atlas shard addresses resolved successfully
+
+2. server/.env
+   - Removed the single quotes around MONGODB_URI (can cause issues on some systems)
+   - Added the database name 'gotrip' to the connection path
+   - Added retryWrites=true&w=majority (Atlas recommended settings)
+
+   Before: MONGODB_URI='mongodb+srv://...@gotrip.ryf8l7t.mongodb.net/?appName=gotrip'
+   After:  MONGODB_URI=mongodb+srv://...@gotrip.ryf8l7t.mongodb.net/gotrip?retryWrites=true&w=majority&appName=gotrip
+
+
+WHAT YOU NEED TO DO NEXT:
+--------------------------
+1. RESTART the server:
+   - Stop the running server (Ctrl+C in the terminal)
+   - Run: npm run dev  (from the server folder)
+   - You should now see: ✅ MongoDB Connected: ac-zxkylks-shard-00-XX.ryf8l7t.mongodb.net
+
+2. WHITELIST your IP in MongoDB Atlas (if not done already):
+   - Go to https://cloud.mongodb.com
+   - Navigate to: Network Access (left sidebar)
+   - Click "Add IP Address"
+   - Click "Allow Access from Anywhere" (adds 0.0.0.0/0) — for development only
+   - Click Confirm
+   - Wait 1-2 minutes for it to propagate
+
+3. VERIFY the connection:
+   - After restart, check the terminal for the ✅ Connected message
+   - Open http://localhost:5000/api/health in your browser — should show database: connected
+
+4. IF IT STILL DOESN'T WORK:
+   a) Check your MongoDB Atlas password — the password in .env is: 8668360688
+      Make sure this matches what you set in Atlas > Database Access > Edit User
+
+   b) Try changing your system DNS to Google DNS:
+      - Open: Settings > Network & Internet > Change adapter options
+      - Right-click your connection > Properties > IPv4 > Properties
+      - Use: 8.8.8.8 (Preferred) and 8.8.4.4 (Alternate)
+
+   c) If behind a corporate/college firewall, MongoDB Atlas port 27017 might be blocked.
+      Ask your network admin to whitelist port 27017, or use a mobile hotspot to test.
+
+
+WHY THIS HAPPENS (Technical Explanation):
+------------------------------------------
+MongoDB Atlas uses SRV records (DNS-based service discovery) when you use a
+mongodb+srv:// connection string. Many Indian ISPs (Jio, Airtel, BSNL, etc.)
+have DNS servers that don't properly resolve SRV records or block them entirely.
+
+The fix forces Node.js to bypass your ISP's DNS and use Google Public DNS
+(8.8.8.8) and Cloudflare DNS (1.1.1.1) which properly resolve all record types.
+
+This is a well-known issue in the Node.js + MongoDB Atlas community.
+
+
+FILES CHANGED:
+--------------
+- server/config/db.js      — Added Google DNS fallback
+- server/.env              — Fixed connection string format
+- mongo help.txt           — This file (you're reading it)
+
+================================================================================
