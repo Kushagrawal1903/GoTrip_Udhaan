@@ -51,15 +51,15 @@ function buildPrompt({ destination, duration, budget, travelStyle, travelers = 1
   const budgetInfo = BUDGET_TIERS[budget];
   const styleInfo = TRAVEL_STYLES[travelStyle];
 
-  return `You are a world-class professional travel planner AI. You MUST generate extremely detailed, comprehensive, and long travel itineraries. Do NOT be brief. Do NOT use short one-line descriptions. Every field must be richly detailed with multiple sentences.
+  return `You are a world-class professional travel planner AI. You must generate structured travel itineraries in JSON format.
 
 CRITICAL RULES:
-- You MUST write LONG, DETAILED descriptions everywhere. Minimum 2-3 sentences per description field.
+- BE EXTREMELY BRIEF. Keep descriptions to a maximum of 5-10 words. Use short phrases, NOT full sentences.
 - You MUST include AT LEAST 4 activities per day (Morning, Afternoon, Evening, Night).
 - You MUST include AT LEAST 5 useful travel tips.
-- You MUST provide transport suggestions as BULLET POINTS (use • separator) with specific airline names, train numbers, bus operators, and approximate costs.
-- Each hotel description MUST be concise — maximum 1-2 sentences covering location and key amenity highlights. Do NOT write long paragraphs for hotels.
-- Each activity description MUST be at least 2 sentences explaining what to do there, why it is worth visiting, and any historical or cultural significance.
+- You MUST provide transport suggestions as BULLET POINTS (use • separator) with approximate costs.
+- Each hotel description MUST be extremely short — maximum 5-10 words.
+- Each activity description MUST be 5-10 words max explaining what to do.
 - Each meal recommendation MUST include the restaurant name, a signature dish, and the price.
 - ALL costs MUST be in Indian Rupees (₹) with realistic pricing.
 
@@ -113,56 +113,56 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
       "priceRange": "₹X,XXX - ₹X,XXX per night",
       "rating": 4.5,
       "mapsLink": "https://www.google.com/maps/search/Hotel+Name+${encodeURIComponent(destination)}",
-      "description": "Concise 1-2 sentence description: location highlight and top amenities (pool, spa, restaurant, etc).",
+      "description": "Short 5-10 word description.",
       "imageQuery": "Hotel Name ${destination} exterior view"
     }
   ],
   "itinerary": [
     {
       "day": 1,
-      "title": "A Creative and Descriptive Day Title",
+      "title": "A short 3-5 word Title",
       "activities": [
         {
           "time": "Morning",
-          "activity": "A detailed 2-3 sentence description of what to do at this place. Include what you will see, why it is famous, and any tips for visiting. Make it engaging and informative.",
+          "activity": "Short 5-10 word description.",
           "placeName": "Full Name of the Place or Attraction",
           "mapsLink": "https://www.google.com/maps/search/Place+Name+${encodeURIComponent(destination)}",
           "estimatedCost": "₹XXX per person"
         },
         {
           "time": "Afternoon",
-          "activity": "Another detailed activity description...",
+          "activity": "Short 5-10 word description.",
           "placeName": "Place Name",
           "mapsLink": "https://www.google.com/maps/search/...",
           "estimatedCost": "₹XXX per person"
         },
         {
           "time": "Evening",
-          "activity": "Another detailed activity description...",
+          "activity": "Short 5-10 word description.",
           "placeName": "Place Name",
           "mapsLink": "https://www.google.com/maps/search/...",
           "estimatedCost": "₹XXX per person"
         },
         {
           "time": "Night",
-          "activity": "Another detailed activity description...",
+          "activity": "Short 5-10 word description.",
           "placeName": "Place Name",
           "mapsLink": "https://www.google.com/maps/search/...",
           "estimatedCost": "₹XXX per person"
         }
       ],
       "meals": {
-        "breakfast": "Restaurant Name — try their famous Dish Name — ₹XXX per person",
-        "lunch": "Restaurant Name — known for Dish Name — ₹XXX per person",
-        "dinner": "Restaurant Name — must-try Dish Name — ₹XXX per person"
+        "breakfast": "Restaurant Name — ₹XXX per person",
+        "lunch": "Restaurant Name — ₹XXX per person",
+        "dinner": "Restaurant Name — ₹XXX per person"
       },
       "estimatedDayCost": "₹X,XXX"
     }
   ],
-  "tips": ["Tip 1: A full detailed sentence with actionable travel advice", "Tip 2: ...", "Tip 3: ...", "Tip 4: ...", "Tip 5: ..."]
+  "tips": ["Tip 1: Short actionable advice (max 10 words).", "Tip 2: ...", "Tip 3: ...", "Tip 4: ...", "Tip 5: ..."]
 }
 
-REMEMBER: Be EXTREMELY detailed and verbose. Every description must be multiple sentences. Do NOT abbreviate or shorten anything. Generate content for ALL ${duration} days.`;
+REMEMBER: Be extremely brief. Max 5-10 words per description. Generate content for ALL ${duration} days.`;
 }
 
 /**
@@ -213,7 +213,7 @@ async function generateTrip({ destination, duration, budget, travelStyle, travel
   const MAX_RETRIES = 2;
 
   const model = genAI.getGenerativeModel({
-    model: 'gemma-3-4b-it',
+    model: 'gemini-2.5-flash',
     generationConfig: {
       temperature: 0.7,
       maxOutputTokens: 16384,
