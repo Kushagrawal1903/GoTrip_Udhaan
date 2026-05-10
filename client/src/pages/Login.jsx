@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 /**
  * Login Page — Full-screen split layout
  */
 export default function Login() {
-    const { login, isAuthenticated } = useAuth();
+    const { login, loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -164,6 +165,33 @@ export default function Login() {
                             ) : 'Sign In'}
                         </button>
                     </form>
+
+                    <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
+                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                        <span style={{ margin: '0 10px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>OR</span>
+                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <GoogleLogin
+                            onSuccess={async (credentialResponse) => {
+                                try {
+                                    setLoading(true);
+                                    await loginWithGoogle(credentialResponse.credential);
+                                    navigate('/plan');
+                                } catch (err) {
+                                    setError(err.response?.data?.message || 'Google Login failed.');
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            onError={() => {
+                                setError('Google Login failed.');
+                            }}
+                            theme="filled_black"
+                            shape="circle"
+                        />
+                    </div>
 
                     {/* Footer */}
                     <p style={{

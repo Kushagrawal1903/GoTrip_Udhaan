@@ -69,11 +69,24 @@ export function AuthProvider({ children }) {
         setUser(null);
     }, []);
 
+    /**
+     * Login with Google
+     * @param {string} googleToken - The credential token from Google Login
+     */
+    const loginWithGoogle = useCallback(async (googleToken) => {
+        const res = await api.post('/auth/google', { token: googleToken });
+        const { user: userData, token: newToken } = res.data.data;
+        localStorage.setItem('gotrip-token', newToken);
+        setToken(newToken);
+        setUser(userData);
+        return res.data;
+    }, []);
+
     const isAuthenticated = !!user && !!token;
 
     return (
         <AuthContext.Provider
-            value={{ user, token, loading, isAuthenticated, login, register, logout }}
+            value={{ user, token, loading, isAuthenticated, login, loginWithGoogle, register, logout }}
         >
             {children}
         </AuthContext.Provider>

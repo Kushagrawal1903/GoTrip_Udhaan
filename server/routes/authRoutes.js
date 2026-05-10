@@ -137,4 +137,68 @@ router.get('/me', auth, async (req, res) => {
     });
 });
 
+const { OAuth2Client } = require('google-auth-library');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+/**
+ * POST /api/auth/google
+ * Login with Google
+ */
+router.post('/google', async (req, res, next) => {
+    try {
+        const { token } = req.body;
+
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                message: 'Google token is required.',
+            });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        const { sub: googleId, email, name } = payload;
+
+        // Find user by Google ID or Email
+        let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+        if (user) {
+            // Update googleId if it doesn't exist (linking existing account)
+            if (!user.googleId) {
+                user.googleId = googleId;
+                await user.save();
+            }
+        } else {
+            // Create new user without password
+            user = await User.create({
+                name,
+                email,
+                googleId,
+            });
+        }
+
+        // Generate JWT
+        const jwtToken = generateToken(user._id);
+
+        res.json({
+            success: true,
+            message: 'Google Login successful!',
+            data: {
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                },
+                token: jwtToken,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

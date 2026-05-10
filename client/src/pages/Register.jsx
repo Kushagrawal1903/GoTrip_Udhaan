@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 
 /**
  * Register Page — Full-screen split layout
  */
 export default function Register() {
-    const { register, isAuthenticated } = useAuth();
+    const { register, loginWithGoogle, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -259,6 +260,34 @@ export default function Register() {
                             ) : 'Create Account'}
                         </button>
                     </form>
+
+                    <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
+                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                        <span style={{ margin: '0 10px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>OR</span>
+                        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }}></div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <GoogleLogin
+                            text="signup_with"
+                            onSuccess={async (credentialResponse) => {
+                                try {
+                                    setLoading(true);
+                                    await loginWithGoogle(credentialResponse.credential);
+                                    navigate('/plan');
+                                } catch (err) {
+                                    setError(err.response?.data?.message || 'Google Registration failed.');
+                                } finally {
+                                    setLoading(false);
+                                }
+                            }}
+                            onError={() => {
+                                setError('Google Registration failed.');
+                            }}
+                            theme="filled_black"
+                            shape="circle"
+                        />
+                    </div>
 
                     <p style={{
                         textAlign: 'center',
