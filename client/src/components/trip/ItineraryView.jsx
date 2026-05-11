@@ -1,59 +1,22 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import DayCard from './DayCard';
 import HotelCard from './HotelCard';
 import BudgetChart from './BudgetChart';
 
 /**
- * ItineraryView — Full-width trip result with PDF export
+ * ItineraryView — Full-width trip result display
  */
 export default function ItineraryView({ tripData, placeDetails, onSave, saving }) {
     const [heroImgFailed, setHeroImgFailed] = useState(false);
-    const [exporting, setExporting] = useState(false);
-    const contentRef = useRef(null);
 
     if (!tripData) return null;
 
     const destinationImage = placeDetails?.photoUrl;
     const showHeroImg = destinationImage && !heroImgFailed;
 
-    /**
-     * Export the trip as PDF using html2pdf.js
-     */
-    const handleExportPDF = async () => {
-        setExporting(true);
-        try {
-            const html2pdf = (await import('html2pdf.js')).default;
-            const element = contentRef.current;
-            if (!element) return;
-
-            const opt = {
-                margin: [10, 10, 10, 10],
-                filename: `GoTrip_${tripData.destination}_${tripData.duration}days.pdf`,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    scrollY: 0,
-                    windowHeight: element.scrollHeight,
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-            };
-
-            await html2pdf().set(opt).from(element).save();
-        } catch (err) {
-            console.error('PDF export failed:', err);
-            alert('PDF export failed. Please try again.');
-        } finally {
-            setExporting(false);
-        }
-    };
-
     return (
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            {/* ─── PRINTABLE CONTENT WRAPPER ─────────────────── */}
-            <div ref={contentRef} className="animate-fade-in-up">
+            <div className="animate-fade-in-up">
 
                 {/* ─── DESTINATION HERO BANNER ───────────────────── */}
                 <div style={{
@@ -253,38 +216,6 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                         </div>
                     </div>
                 )}
-            </div>
-
-            {/* ─── PDF EXPORT ───── */}
-            <div style={{
-                textAlign: 'center',
-                padding: '20px 0 40px',
-                borderTop: '1px solid var(--border-color)',
-                marginTop: 8,
-            }}>
-                <button
-                    onClick={handleExportPDF}
-                    disabled={exporting}
-                    style={{
-                        padding: '14px 36px',
-                        background: exporting ? 'var(--bg-glass)' : 'var(--color-primary)',
-                        color: '#fff',
-                        fontWeight: 600,
-                        fontSize: '0.95rem',
-                        borderRadius: 10,
-                        border: 'none',
-                        cursor: exporting ? 'not-allowed' : 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        transition: 'all 0.2s',
-                    }}
-                >
-                    {exporting ? 'Generating PDF...' : 'Save as PDF'}
-                </button>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.76rem', marginTop: 8 }}>
-                    Download the complete itinerary as a printable PDF document
-                </p>
             </div>
         </div>
     );

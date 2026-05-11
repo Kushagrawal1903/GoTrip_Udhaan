@@ -1,9 +1,11 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
+const { initializeSocket } = require('./socket/index');
 
 // Load environment variables
 dotenv.config();
@@ -11,9 +13,19 @@ dotenv.config();
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const tripRoutes = require('./routes/tripRoutes');
+const packingListRoutes = require('./routes/packingList');
+const exportRoutes = require('./routes/export');
+const createCollaborateRouter = require('./routes/collaborate');
 
-// Initialize Express app
+// Initialize Express app and HTTP server
 const app = express();
+const httpServer = http.createServer(app);
+
+// Initialize Socket.io
+const io = initializeSocket(httpServer);
+
+// Make io accessible to routes via app.locals
+app.locals.io = io;
 
 // ─── MIDDLEWARE ──────────────────────────────────────────────
 
@@ -34,7 +46,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// Stricter rate limit for AI generation endpoint
+// Stricter rate limit for AI generation endpoints
 const aiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 20, // Limit to 20 AI requests per 15 min
@@ -44,6 +56,7 @@ const aiLimiter = rateLimit({
     },
 });
 app.use('/api/trips/generate', aiLimiter);
+app.use('/api/packing-list/generate', aiLimiter);
 
 // ─── ROUTES ─────────────────────────────────────────────────
 
@@ -61,6 +74,15 @@ app.use('/api/auth', authRoutes);
 
 // Trip routes
 app.use('/api/trips', tripRoutes);
+
+// Packing list routes (Feature 1)
+app.use('/api/packing-list', packingListRoutes);
+
+// PDF export routes (Feature 2)
+app.use('/api/export', exportRoutes);
+
+// Collaboration routes (Feature 3) — pass io instance
+app.use('/api/collaborate', createCollaborateRouter(io));
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 
@@ -86,11 +108,12 @@ if (require.main === module) {
     const startServer = async () => {
         const dbConnected = await connectDB();
 
-        app.listen(PORT, () => {
+        httpServer.listen(PORT, () => {
             console.log(`\n🚀 GoTrip Pro API Server`);
             console.log(`   Port:     ${PORT}`);
             console.log(`   Mode:     ${process.env.NODE_ENV || 'development'}`);
             console.log(`   Database: ${dbConnected ? '✅ Connected' : '⚠️  Not connected'}`);
+            console.log(`   Socket:   ✅ Ready`);
             console.log(`   Health:   http://localhost:${PORT}/api/health\n`);
         });
     };

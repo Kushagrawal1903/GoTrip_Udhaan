@@ -132,13 +132,18 @@ router.post('/save', auth, async (req, res, next) => {
 
 /**
  * GET /api/trips
- * Get all saved trips for the authenticated user
+ * Get all saved trips for the authenticated user (owned + collaborated)
  */
 router.get('/', auth, async (req, res, next) => {
     try {
-        const trips = await Trip.find({ userId: req.userId })
+        const trips = await Trip.find({
+            $or: [
+                { userId: req.userId },
+                { 'collaborators.userId': req.userId, 'collaborators.status': 'accepted' },
+            ],
+        })
             .sort({ createdAt: -1 })
-            .select('-tripData'); // Exclude full trip data for list view
+            .select('-tripData -comments'); // Exclude heavy fields for list view
 
         res.json({
             success: true,
@@ -151,13 +156,16 @@ router.get('/', auth, async (req, res, next) => {
 
 /**
  * GET /api/trips/:id
- * Get a single saved trip by ID
+ * Get a single saved trip by ID (owner or accepted collaborator)
  */
 router.get('/:id', auth, async (req, res, next) => {
     try {
         const trip = await Trip.findOne({
             _id: req.params.id,
-            userId: req.userId,
+            $or: [
+                { userId: req.userId },
+                { 'collaborators.userId': req.userId, 'collaborators.status': 'accepted' },
+            ],
         });
 
         if (!trip) {

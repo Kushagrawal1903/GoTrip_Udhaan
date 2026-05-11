@@ -65,6 +65,18 @@ function TripCard({ trip, index, onDelete, deleting, onView }) {
                 }}>
                     {trip.destination}
                 </h3>
+                {/* Collaborator badge */}
+                {trip.collaborators && trip.collaborators.length > 0 && (
+                    <div style={{
+                        position: 'absolute', top: 10, right: 10, zIndex: 2,
+                        padding: '3px 9px', borderRadius: 6,
+                        background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+                        color: '#fff', fontSize: '0.7rem', fontWeight: 700,
+                        display: 'flex', alignItems: 'center', gap: 4,
+                    }}>
+                        👥 {trip.collaborators.length}
+                    </div>
+                )}
             </div>
 
             {/* Card Body */}

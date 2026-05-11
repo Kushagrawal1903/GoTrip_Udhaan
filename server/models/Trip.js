@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 /**
  * Trip Schema
- * Stores generated trip data associated with a user
+ * Stores generated trip data associated with a user,
+ * including packing list, collaboration data, and comments.
  */
 const tripSchema = new mongoose.Schema(
     {
@@ -54,10 +55,54 @@ const tripSchema = new mongoose.Schema(
             lat: { type: Number, default: null },
             lng: { type: Number, default: null },
         },
+
+        // ─── FEATURE 1: Smart Packing List ─────────────────────
+        packingList: {
+            categories: [{
+                name: String,
+                icon: String,
+                items: [{
+                    name: String,
+                    quantity: Number,
+                    essential: Boolean,
+                    note: String,
+                    checked: { type: Boolean, default: false },
+                }],
+            }],
+            weatherNote: String,
+            proTip: String,
+            generatedAt: Date,
+        },
+
+        // ─── FEATURE 3: Collaborative Trip Planning ────────────
+        collaborators: [{
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            email: String,
+            role: { type: String, enum: ['viewer', 'editor'], default: 'viewer' },
+            invitedAt: { type: Date, default: Date.now },
+            acceptedAt: Date,
+            status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' },
+        }],
+        comments: [{
+            _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            userName: String,
+            userAvatar: String,
+            dayIndex: Number,
+            timeSlot: String,
+            text: String,
+            suggestion: String,
+            status: { type: String, enum: ['open', 'accepted', 'dismissed'], default: 'open' },
+            createdAt: { type: Date, default: Date.now },
+        }],
+        shareToken: { type: String, unique: true, sparse: true },
     },
     {
         timestamps: true,
     }
 );
+
+// Index for collaboration queries
+tripSchema.index({ 'collaborators.email': 1 });
 
 module.exports = mongoose.model('Trip', tripSchema);

@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import PlanTrip from './pages/PlanTrip';
 import Dashboard from './pages/Dashboard';
 import TripResult from './pages/TripResult';
+import JoinTrip from './pages/JoinTrip';
 
 /**
  * ProtectedRoute — redirects to login if not authenticated
@@ -87,6 +88,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <TripResult />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/join/:shareToken"
+            element={
+              <ProtectedRoute>
+                <JoinTrip />
               </ProtectedRoute>
             }
           />
