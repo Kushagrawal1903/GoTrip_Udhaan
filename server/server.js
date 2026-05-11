@@ -16,6 +16,8 @@ const tripRoutes = require('./routes/tripRoutes');
 const packingListRoutes = require('./routes/packingList');
 const exportRoutes = require('./routes/export');
 const createCollaborateRouter = require('./routes/collaborate');
+const dashboardRoutes = require('./routes/dashboard');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -83,6 +85,12 @@ app.use('/api/export', exportRoutes);
 
 // Collaboration routes (Feature 3) — pass io instance
 app.use('/api/collaborate', createCollaborateRouter(io));
+
+// Dashboard analytics routes
+app.use('/api/dashboard', dashboardRoutes);
+
+// Notification routes
+app.use('/api/notifications', notificationRoutes);
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 

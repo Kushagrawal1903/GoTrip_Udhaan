@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/layout/Navbar';
@@ -6,9 +7,18 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PlanTrip from './pages/PlanTrip';
-import Dashboard from './pages/Dashboard';
 import TripResult from './pages/TripResult';
 import JoinTrip from './pages/JoinTrip';
+import DashboardLayout from './layouts/DashboardLayout';
+
+// Lazy-loaded dashboard pages
+const DashboardHome = lazy(() => import('./pages/dashboard/DashboardHome'));
+const MyTrips = lazy(() => import('./pages/dashboard/MyTrips'));
+const TravelStats = lazy(() => import('./pages/dashboard/TravelStats'));
+const PackingLists = lazy(() => import('./pages/dashboard/PackingLists'));
+const Collaborations = lazy(() => import('./pages/dashboard/Collaborations'));
+const Exports = lazy(() => import('./pages/dashboard/Exports'));
+const Explore = lazy(() => import('./pages/dashboard/Explore'));
 
 /**
  * ProtectedRoute — redirects to login if not authenticated
@@ -36,7 +46,7 @@ function ProtectedRoute({ children }) {
  * Main App component with routing and layout
  */
 export default function App() {
-  const { loading } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -60,49 +70,67 @@ export default function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
-      <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/plan"
-            element={
-              <ProtectedRoute>
-                <PlanTrip />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/trip/:id"
-            element={
-              <ProtectedRoute>
-                <TripResult />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/join/:shareToken"
-            element={
-              <ProtectedRoute>
-                <JoinTrip />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-      <Footer />
-    </div>
+    <Routes>
+      {/* ─── Dashboard layout routes (sidebar + topbar) ─── */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<DashboardHome />} />
+        <Route path="trips" element={<MyTrips />} />
+        <Route path="stats" element={<TravelStats />} />
+        <Route path="packing-lists" element={<PackingLists />} />
+        <Route path="collaborations" element={<Collaborations />} />
+        <Route path="exports" element={<Exports />} />
+        <Route path="explore" element={<Explore />} />
+      </Route>
+
+      {/* ─── Public/standalone routes (with Navbar + Footer) ─── */}
+      <Route
+        path="*"
+        element={
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Navbar />
+            <main style={{ flex: 1 }}>
+              <Routes>
+                <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Home />} />
+                <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+                <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} />
+                <Route
+                  path="/plan"
+                  element={
+                    <ProtectedRoute>
+                      <PlanTrip />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/trip/:id"
+                  element={
+                    <ProtectedRoute>
+                      <TripResult />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/join/:shareToken"
+                  element={
+                    <ProtectedRoute>
+                      <JoinTrip />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+    </Routes>
   );
 }

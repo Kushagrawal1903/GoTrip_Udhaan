@@ -554,3 +554,63 @@ a {
     display: none !important;
   }
 }
+
+/* ─── DASHBOARD LAYOUT RESPONSIVE ────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Desktop: sidebar visible, bottom nav hidden */
+.sidebar-desktop { display: block; }
+.mobile-bottom-nav { display: none !important; }
+.mobile-menu-toggle { display: none !important; }
+
+/* Tablet: ≤1023px — narrower right column */
+@media (max-width: 1023px) {
+  .dashboard-content {
+    grid-template-columns: 1fr 280px !important;
+  }
+  .stats-chart-row {
+    grid-template-columns: 1fr !important;
+  }
+  .stats-highlights {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+}
+
+/* Mobile: <768px — sidebar hidden, bottom nav shown */
+@media (max-width: 767px) {
+  .sidebar-desktop {
+    display: none !important;
+  }
+  .mobile-bottom-nav {
+    display: flex !important;
+  }
+  .mobile-menu-toggle {
+    display: flex !important;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dashboard-content {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-right-col {
+    order: 10;
+  }
+  .trips-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .stats-chart-row {
+    grid-template-columns: 1fr !important;
+  }
+  .stats-highlights {
+    grid-template-columns: 1fr !important;
+  }
+}
