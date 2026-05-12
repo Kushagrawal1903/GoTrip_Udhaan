@@ -582,6 +582,9 @@ a {
   .stats-highlights {
     grid-template-columns: 1fr 1fr 1fr !important;
   }
+  .explore-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 /* Mobile: <768px — sidebar hidden, bottom nav shown */
@@ -611,6 +614,9 @@ a {
     grid-template-columns: 1fr !important;
   }
   .stats-highlights {
+    grid-template-columns: 1fr !important;
+  }
+  .explore-grid {
     grid-template-columns: 1fr !important;
   }
 }

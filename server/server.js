@@ -18,6 +18,7 @@ const exportRoutes = require('./routes/export');
 const createCollaborateRouter = require('./routes/collaborate');
 const dashboardRoutes = require('./routes/dashboard');
 const notificationRoutes = require('./routes/notifications');
+const exploreRoutes = require('./routes/explore');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -91,6 +92,9 @@ app.use('/api/dashboard', dashboardRoutes);
 
 // Notification routes
 app.use('/api/notifications', notificationRoutes);
+
+// Explore / Discover destinations routes
+app.use('/api/explore', exploreRoutes);
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 

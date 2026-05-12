@@ -220,4 +220,5 @@ module.exports = {
     getPlaceDetails,
     getHotelPhoto,
     getMapEmbedUrl,
+    getWikipediaImage,
 };
