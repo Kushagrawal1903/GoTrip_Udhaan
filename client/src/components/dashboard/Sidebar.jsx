@@ -74,19 +74,21 @@ export default function Sidebar({ collapsed, onToggle, badges = {} }) {
                 borderBottom: '1px solid var(--border-color)',
                 minHeight: 64,
             }}>
-                <div style={{
-                    width: 32, height: 32, borderRadius: 8,
-                    background: 'linear-gradient(135deg, #0d9488, #14b8a6)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.9rem', fontWeight: 800, color: '#fff', flexShrink: 0,
-                }}>G</div>
+                <img 
+                    src="/GoTrip_Logo.jpeg" 
+                    alt="GoTrip Logo" 
+                    style={{
+                        width: 32, 
+                        height: 32, 
+                        borderRadius: 8,
+                        objectFit: 'cover',
+                        flexShrink: 0,
+                    }}
+                />
                 {!collapsed && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)' }}>GoTrip</span>
-                        <span style={{
-                            fontSize: '0.6rem', fontWeight: 700, padding: '2px 6px', borderRadius: 4,
-                            background: 'linear-gradient(135deg, #0d9488, #14b8a6)', color: '#fff',
-                        }}>PRO</span>
+                        
                     </div>
                 )}
                 {!collapsed && (

@@ -22,7 +22,7 @@ export default function ThemeToggle() {
                 borderRadius: '50%',
                 cursor: 'pointer',
                 fontSize: '1.2rem',
-                transition: 'all 0.3s ease',
+                transition: 'background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease, transform 0.2s ease',
                 color: 'var(--text-primary)',
             }}
         >

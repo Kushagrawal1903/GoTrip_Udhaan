@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import TripForm from '../components/trip/TripForm';
-import ItineraryView from '../components/trip/ItineraryView';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 
@@ -12,21 +11,29 @@ import ErrorAlert from '../components/ui/ErrorAlert';
 export default function PlanTrip() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
-    const [result, setResult] = useState(null);
-    const [formData, setFormData] = useState(null);
 
     const handleGenerate = async (data) => {
         setLoading(true);
         setError('');
-        setResult(null);
-        setFormData(data);
 
         try {
             const res = await api.post('/trips/generate', data);
-            setResult(res.data.data);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Auto-save the trip to enable export/collaboration/packing features
+            const saveRes = await api.post('/trips/save', {
+                destination: data.destination,
+                duration: data.duration,
+                budget: data.budget,
+                travelStyle: data.travelStyle,
+                travelers: data.travelers,
+                tripData: res.data.data.tripData,
+                destinationImage: res.data.data.placeDetails?.photoUrl || null,
+                coordinates: res.data.data.placeDetails?.coordinates || null,
+            });
+            
+            // Redirect to the trip result page with all features
+            navigate(`/trip/${saveRes.data.data.trip._id}`);
         } catch (err) {
             const msg = err.response?.data?.message || 'Failed to generate trip. Please try again.';
             setError(msg);
@@ -35,32 +42,10 @@ export default function PlanTrip() {
         }
     };
 
-    const handleSave = async () => {
-        if (!result || !formData) return;
-        setSaving(true);
-        try {
-            await api.post('/trips/save', {
-                destination: formData.destination,
-                duration: formData.duration,
-                budget: formData.budget,
-                travelStyle: formData.travelStyle,
-                travelers: formData.travelers,
-                tripData: result.tripData,
-                destinationImage: result.placeDetails?.photoUrl || null,
-                coordinates: result.placeDetails?.coordinates || null,
-            });
-            navigate('/dashboard');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to save trip.');
-        } finally {
-            setSaving(false);
-        }
-    };
-
     return (
         <div style={{ padding: '40px 24px', maxWidth: 1000, margin: '0 auto' }}>
             {/* Page Header */}
-            {!result && !loading && (
+            {!loading && (
                 <div className="animate-fade-in-up" style={{ textAlign: 'center', marginBottom: 36 }}>
                     <h1 style={{
                         fontWeight: 700,
@@ -85,7 +70,7 @@ export default function PlanTrip() {
             )}
 
             {/* Trip Form */}
-            {!result && !loading && (
+            {!loading && (
                 <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                     <TripForm onSubmit={handleGenerate} loading={loading} />
                 </div>
@@ -98,31 +83,8 @@ export default function PlanTrip() {
             {error && (
                 <ErrorAlert
                     message={error}
-                    onRetry={() => { setError(''); setResult(null); }}
+                    onRetry={() => { setError(''); }}
                 />
-            )}
-
-            {/* Results */}
-            {result && !loading && (
-                <div className="animate-fade-in-up">
-                    <ItineraryView
-                        tripData={result.tripData}
-                        placeDetails={result.placeDetails}
-                        onSave={handleSave}
-                        saving={saving}
-                    />
-
-                    {/* Re-generate button */}
-                    <div style={{ textAlign: 'center', marginTop: 12, marginBottom: 32 }}>
-                        <button
-                            className="btn-outline"
-                            onClick={() => { setResult(null); setError(''); }}
-                            style={{ padding: '12px 32px' }}
-                        >
-                            Plan a Different Trip
-                        </button>
-                    </div>
-                </div>
             )}
         </div>
     );

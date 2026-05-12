@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
+import ThemeToggle from '../layout/ThemeToggle';
 
 const PAGE_TITLES = {
     '/dashboard': 'Dashboard',
@@ -20,7 +21,7 @@ export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle
     const title = PAGE_TITLES[location.pathname] || 'Dashboard';
 
     useEffect(() => {
-        document.title = `${title} — GoTrip Pro`;
+        document.title = `${title} — GoTrip`;
     }, [title]);
 
     return (
@@ -80,6 +81,9 @@ export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto' }}>
+                {/* Theme Toggle */}
+                <ThemeToggle />
+
                 {/* Notifications */}
                 <NotificationDropdown userId={user?.id} />
 
