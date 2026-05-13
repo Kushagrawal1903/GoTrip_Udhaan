@@ -20,6 +20,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const notificationRoutes = require('./routes/notifications');
 const exploreRoutes = require('./routes/explore');
 const whatsappRoutes = require('./routes/whatsapp');
+const emailRoutes = require('./routes/email');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -99,6 +100,9 @@ app.use('/api/explore', exploreRoutes);
 
 // WhatsApp trip delivery routes
 app.use('/api/whatsapp', whatsappRoutes);
+
+// Email trip delivery routes
+app.use('/api/email', emailRoutes);
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 

@@ -55,7 +55,7 @@ async function sendWelcomeEmail(user) {
     }
 
     const displayName = name || 'Traveler';
-    const clientUrl = process.env.CLIENT_URL || 'https://mygotrip.vercel.app';
+    const clientUrl = process.env.CLIENT_URL || 'https://mygotrip.online';
     const fromAddress = process.env.EMAIL_FROM || 'GoTrip <onboarding@resend.dev>';
 
     const htmlBody = `
@@ -204,6 +204,174 @@ async function sendWelcomeEmail(user) {
     }
 }
 
+// ─── TRIP DELIVERY EMAIL (via Resend) ────────────────────────
+
+/**
+ * Send a beautiful trip summary email via Resend.
+ * @param {Object} params
+ * @param {string} params.userName       - Display name of the user
+ * @param {string} params.recipientEmail - Email to send to
+ * @param {string} params.destination    - Trip destination
+ * @param {string} params.duration       - Duration label e.g. "3 Days"
+ * @param {string} params.budget         - Budget label
+ * @param {string} params.travelStyle    - Travel style label (optional)
+ * @param {number} params.travelers      - Number of travelers
+ * @param {string} params.tripUrl        - Full URL to view the trip
+ * @param {string} params.tripId         - Trip MongoDB _id
+ */
+async function sendTripEmail({ userName, recipientEmail, destination, duration, budget, travelStyle, travelers, tripUrl, tripId }) {
+    const resend = getResendClient();
+    if (!resend) {
+        const err = new Error('Email service is not configured.');
+        err.statusCode = 503;
+        throw err;
+    }
+
+    if (!recipientEmail) {
+        const err = new Error('Recipient email is required.');
+        err.statusCode = 400;
+        throw err;
+    }
+
+    const displayName = userName || 'Traveler';
+    const fromAddress = process.env.EMAIL_FROM || 'GoTrip <hello@mygotrip.online>';
+    const year = new Date().getFullYear();
+
+    // Build detail rows for the trip summary card
+    const detailRows = [
+        { icon: '&#128205;', label: 'Destination', value: destination },
+        { icon: '&#128197;', label: 'Duration', value: duration },
+        { icon: '&#128176;', label: 'Budget', value: budget },
+        { icon: '&#128101;', label: 'Travelers', value: `${travelers} ${travelers > 1 ? 'people' : 'person'}` },
+    ];
+    if (travelStyle) {
+        detailRows.push({ icon: '&#127919;', label: 'Style', value: travelStyle });
+    }
+
+    const detailRowsHtml = detailRows.map(row => `
+        <tr>
+          <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="32" style="font-size:18px;">${row.icon}</td>
+                <td style="font-size:13px;color:#64748b;font-weight:500;">${row.label}</td>
+                <td align="right" style="font-size:14px;color:#1e293b;font-weight:600;">${row.value}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>`).join('');
+
+    const htmlBody = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your ${destination} Trip — GoTrip</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 16px;">
+<tr><td align="center">
+<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+  <!-- Header gradient -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 40%,#0d7377 100%);padding:44px 40px 36px;text-align:center;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding-bottom:14px;">
+          <span style="font-size:42px;">&#9992;&#65039;</span>
+        </td></tr>
+        <tr><td align="center">
+          <h1 style="margin:0;font-size:26px;font-weight:800;color:#ffffff;letter-spacing:-0.5px;">Your Trip is Ready!</h1>
+        </td></tr>
+        <tr><td align="center" style="padding-top:8px;">
+          <p style="margin:0;font-size:14px;color:rgba(255,255,255,0.8);font-weight:400;">&#128205; ${destination}</p>
+        </td></tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Body -->
+  <tr>
+    <td style="padding:36px 40px 20px;">
+      <h2 style="margin:0 0 18px;font-size:22px;font-weight:700;color:#1a1a2e;">Hi ${displayName} &#128075;</h2>
+
+      <p style="margin:0 0 20px;font-size:15px;color:#475569;line-height:1.7;">
+        Your personalized AI-generated itinerary for <strong>${destination}</strong> is ready!
+        Explore destinations, hotels, activities, and travel insights tailored just for your trip.
+      </p>
+
+      <!-- Trip Summary Card -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);padding:16px 16px 6px;">
+            <h3 style="margin:0;font-size:15px;font-weight:700;color:#334155;letter-spacing:0.3px;">TRIP SUMMARY</h3>
+          </td>
+        </tr>
+        ${detailRowsHtml}
+      </table>
+
+      <!-- CTA Button -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr><td align="center" style="padding:8px 0 20px;">
+          <a href="${tripUrl}" target="_blank" style="display:inline-block;background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);color:#ffffff;text-decoration:none;padding:16px 44px;border-radius:12px;font-size:16px;font-weight:700;letter-spacing:0.3px;box-shadow:0 4px 14px rgba(13,148,136,0.35);">
+            View Full Trip &#8594;
+          </a>
+        </td></tr>
+      </table>
+
+      <p style="margin:0;font-size:12px;color:#94a3b8;text-align:center;line-height:1.6;">
+        If the button doesn't work, copy this link:<br/>
+        <a href="${tripUrl}" style="color:#0d9488;word-break:break-all;">${tripUrl}</a>
+      </p>
+    </td>
+  </tr>
+
+  <!-- Divider -->
+  <tr><td style="padding:0 40px;">
+    <hr style="border:none;border-top:1px solid #e2e8f0;margin:0;" />
+  </td></tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="padding:24px 40px 32px;text-align:center;">
+      <p style="margin:0 0 8px;font-size:13px;color:#64748b;">
+        Have an amazing journey &#127757;
+      </p>
+      <p style="margin:0 0 12px;font-size:13px;color:#94a3b8;font-weight:500;">
+        &#8212; Team GoTrip
+      </p>
+      <p style="margin:0;font-size:11px;color:#cbd5e1;">
+        &copy; ${year} GoTrip. All rights reserved.
+      </p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+    const textBody = `Hi ${displayName}\n\nYour ${destination} trip is ready!\n\nTrip Summary:\n- Destination: ${destination}\n- Duration: ${duration}\n- Budget: ${budget}\n- Travelers: ${travelers}${travelStyle ? `\n- Style: ${travelStyle}` : ''}\n\nView your full trip: ${tripUrl}\n\nHave an amazing journey!\n— Team GoTrip\n\n(c) ${year} GoTrip. All rights reserved.`;
+
+    try {
+        await resend.emails.send({
+            from: fromAddress,
+            to: recipientEmail,
+            subject: `Your ${destination} Trip is Ready — GoTrip`,
+            html: htmlBody,
+            text: textBody,
+        });
+        console.log(`Trip email sent to: ${recipientEmail}`);
+    } catch (error) {
+        console.error(`Failed to send trip email to ${recipientEmail}:`, error.message);
+        const err = new Error('Failed to send trip email. Please try again.');
+        err.statusCode = 502;
+        throw err;
+    }
+}
+
 // ─── INVITE EMAIL (via Nodemailer / SMTP) ───────────────────
 
 /**
@@ -276,4 +444,4 @@ async function sendInviteEmail({ ownerName, recipientEmail, destination, duratio
     });
 }
 
-module.exports = { sendWelcomeEmail, sendInviteEmail };
+module.exports = { sendWelcomeEmail, sendTripEmail, sendInviteEmail };

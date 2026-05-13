@@ -2,37 +2,36 @@ const express = require('express');
 const auth = require('../middleware/auth');
 const Trip = require('../models/Trip');
 const User = require('../models/User');
-const { sendTripWhatsApp, sanitizePhoneNumber, isValidPhoneNumber } = require('../services/whatsappService');
+const { sendTripEmail } = require('../services/emailService');
 
 const router = express.Router();
 
 /**
- * POST /api/whatsapp/send-trip
- * Send trip details to a WhatsApp number via Meta Cloud API.
+ * POST /api/email/send-trip
+ * Send trip details to an email address via Resend.
  * Protected route — requires authentication.
  *
  * Request body:
- *   { phoneNumber: string, tripId: string }
+ *   { email: string, tripId: string }
  */
 router.post('/send-trip', auth, async (req, res, next) => {
     try {
-        const { phoneNumber, tripId } = req.body;
+        const { email, tripId } = req.body;
 
         // ─── Validate inputs ─────────────────────────────────────
-        if (!phoneNumber || !tripId) {
+        if (!email || !tripId) {
             return res.status(400).json({
                 success: false,
-                message: 'Phone number and trip ID are required.',
+                message: 'Email and trip ID are required.',
             });
         }
 
-        // Sanitize phone number
-        const cleanPhone = sanitizePhoneNumber(phoneNumber);
-
-        if (!isValidPhoneNumber(cleanPhone)) {
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
             return res.status(400).json({
                 success: false,
-                message: 'Please provide a valid WhatsApp phone number.',
+                message: 'Please provide a valid email address.',
             });
         }
 
@@ -46,11 +45,11 @@ router.post('/send-trip', auth, async (req, res, next) => {
             });
         }
 
-        // Authorization: only the trip owner can send it via WhatsApp
+        // Authorization: only the trip owner can send it via email
         if (trip.userId.toString() !== req.userId.toString()) {
             return res.status(403).json({
                 success: false,
-                message: 'You can only send your own trips via WhatsApp.',
+                message: 'You can only send your own trips via email.',
             });
         }
 
@@ -61,44 +60,52 @@ router.post('/send-trip', auth, async (req, res, next) => {
         // ─── Map trip data ──────────────────────────────────────
         const destination = trip.destination || 'your destination';
 
-        // Duration: stored as a number (days) in the schema
-        const duration = trip.duration ? `${trip.duration} Day${trip.duration > 1 ? 's' : ''}` : 'N/A';
+        const duration = trip.duration
+            ? `${trip.duration} Day${trip.duration > 1 ? 's' : ''}`
+            : 'N/A';
 
-        // Budget: stored as tier (low/moderate/premium) — map to display-friendly text
         const budgetMap = {
             low: 'Budget-Friendly',
             moderate: 'Moderate',
             premium: 'Premium',
         };
-        // Check tripData for estimated cost first, fall back to tier label
         const estimatedCost = trip.tripData?.estimatedBudget || trip.tripData?.totalBudget || trip.tripData?.budget;
         const budget = estimatedCost
             ? String(estimatedCost)
             : budgetMap[trip.budget] || trip.budget || 'N/A';
 
-        // Build the trip URL
+        const travelStyleMap = {
+            adventure: 'Adventure',
+            relaxation: 'Relaxation',
+            cultural: 'Cultural',
+            family: 'Family',
+            romantic: 'Romantic',
+        };
+        const travelStyle = travelStyleMap[trip.travelStyle] || trip.travelStyle || null;
+
+        const travelers = trip.travelers || 1;
+
         const clientUrl = process.env.CLIENT_URL || 'https://mygotrip.online';
         const tripUrl = `${clientUrl}/trip/${trip._id}`;
 
-        // ─── Send via WhatsApp Cloud API ────────────────────────
-        const result = await sendTripWhatsApp({
-            phoneNumber: cleanPhone,
+        // ─── Send via Resend ────────────────────────────────────
+        await sendTripEmail({
             userName,
+            recipientEmail: email,
             destination,
             duration,
             budget,
+            travelStyle,
+            travelers,
             tripUrl,
+            tripId: trip._id.toString(),
         });
 
         res.json({
             success: true,
-            message: 'Trip sent to WhatsApp successfully!',
-            data: {
-                messageId: result?.messages?.[0]?.id || null,
-            },
+            message: 'Trip sent to your email successfully!',
         });
     } catch (error) {
-        // If the error already has a statusCode from the service, use it
         if (error.statusCode) {
             return res.status(error.statusCode).json({
                 success: false,

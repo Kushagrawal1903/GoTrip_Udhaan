@@ -6,13 +6,15 @@ import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
 import CollaboratorPanel from '../components/CollaboratorPanel';
 import WhatsAppModal from '../components/trip/WhatsAppModal';
+import TripEmailModal from '../components/trip/TripEmailModal';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import usePackingList from '../hooks/usePackingList';
 import useCollaboration from '../hooks/useCollaboration';
 import useSocket from '../hooks/useSocket';
 import useWhatsApp from '../hooks/useWhatsApp';
-import { FaWhatsapp } from 'react-icons/fa';
+import useTripEmail from '../hooks/useTripEmail';
+import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
 /**
  * TripResult — view a single saved trip with packing list, PDF export, and collaboration
@@ -38,6 +40,9 @@ export default function TripResult() {
 
     // WhatsApp hook
     const whatsapp = useWhatsApp(id);
+
+    // Email delivery hook
+    const tripEmail = useTripEmail(id);
 
     // Socket.io for real-time collaboration
     useSocket(id, {
@@ -236,6 +241,40 @@ export default function TripResult() {
                         </button>
                     )}
 
+                    {/* Email button — only for trip owner */}
+                    {isOwner && (
+                        <button
+                            onClick={tripEmail.open}
+                            aria-label="Receive trip via email"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 7,
+                                padding: '8px 20px',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                color: '#fff',
+                                background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                                border: 'none',
+                                borderRadius: 10,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 8px rgba(13, 148, 136, 0.25)',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(13, 148, 136, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(13, 148, 136, 0.25)';
+                            }}
+                        >
+                            <FaEnvelope size={15} />
+                            Receive via Email
+                        </button>
+                    )}
+
                     <button
                         className="btn-outline"
                         onClick={() => navigate('/plan')}
@@ -291,6 +330,18 @@ export default function TripResult() {
                 error={whatsapp.error}
                 success={whatsapp.success}
                 destination={trip.destination}
+            />
+
+            {/* Email Modal */}
+            <TripEmailModal
+                isOpen={tripEmail.isOpen}
+                onClose={tripEmail.close}
+                onSend={tripEmail.send}
+                sending={tripEmail.sending}
+                error={tripEmail.error}
+                success={tripEmail.success}
+                destination={trip.destination}
+                defaultEmail={user?.email || ''}
             />
         </div>
     );
