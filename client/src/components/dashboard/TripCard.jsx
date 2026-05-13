@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const STYLE_THEMES = {
-    adventure:  { bg: 'linear-gradient(135deg, #065f46, #059669)', emoji: '🏔️', color: '#059669' },
+    adventure: { bg: 'linear-gradient(135deg, #065f46, #059669)', emoji: '🏔️', color: '#059669' },
     relaxation: { bg: 'linear-gradient(135deg, #0e7490, #14b8a6)', emoji: '🏖️', color: '#0d9488' },
-    cultural:   { bg: 'linear-gradient(135deg, #92400e, #d97706)', emoji: '🏛️', color: '#d97706' },
-    family:     { bg: 'linear-gradient(135deg, #1e40af, #3b82f6)', emoji: '🎡', color: '#3b82f6' },
-    romantic:   { bg: 'linear-gradient(135deg, #9d174d, #ec4899)', emoji: '🌹', color: '#ec4899' },
+    cultural: { bg: 'linear-gradient(135deg, #92400e, #d97706)', emoji: '🏛️', color: '#d97706' },
+    family: { bg: 'linear-gradient(135deg, #1e40af, #3b82f6)', emoji: '🎡', color: '#3b82f6' },
+    romantic: { bg: 'linear-gradient(135deg, #9d174d, #ec4899)', emoji: '🌹', color: '#ec4899' },
 };
 const DEFAULT_THEME = { bg: 'linear-gradient(135deg, #374151, #6b7280)', emoji: '✈️', color: '#6b7280' };
 
@@ -102,7 +102,7 @@ const TripCard = React.memo(function TripCard({ trip, onExportPDF }) {
                         <button
                             key={btn.label}
                             onClick={e => { e.stopPropagation(); btn.action(e); }}
-                            disabled={btn.label === '...' }
+                            disabled={btn.label === '...'}
                             aria-label={btn.label}
                             style={{
                                 flex: 1, padding: '7px 4px', borderRadius: 6,

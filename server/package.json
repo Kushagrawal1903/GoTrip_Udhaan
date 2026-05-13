@@ -17,7 +17,6 @@
   "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
-    "@sparticuz/chromium": "^148.0.0",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -29,7 +28,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^8.9.5",
     "nodemailer": "^8.0.7",
-    "puppeteer-core": "^24.43.1",
+    "pdfkit": "^0.18.0",
     "resend": "^6.12.3",
     "socket.io": "^4.8.3"
   },

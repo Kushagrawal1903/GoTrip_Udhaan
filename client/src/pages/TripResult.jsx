@@ -5,14 +5,12 @@ import api from '../services/api';
 import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
 import CollaboratorPanel from '../components/CollaboratorPanel';
-import WhatsAppModal from '../components/trip/WhatsAppModal';
 import TripEmailModal from '../components/trip/TripEmailModal';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import usePackingList from '../hooks/usePackingList';
 import useCollaboration from '../hooks/useCollaboration';
 import useSocket from '../hooks/useSocket';
-import useWhatsApp from '../hooks/useWhatsApp';
 import useTripEmail from '../hooks/useTripEmail';
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
@@ -38,8 +36,67 @@ export default function TripResult() {
     // Collaboration hook
     const collab = useCollaboration(id, isOwner);
 
-    // WhatsApp hook
-    const whatsapp = useWhatsApp(id);
+    /**
+     * Share on WhatsApp — Click-to-Chat (no API, no modal, no phone input).
+     * Generates a premium pre-filled message and opens wa.me in a new tab.
+     */
+    const handleShareWhatsApp = () => {
+        if (!trip) return;
+
+        const destination = trip.destination || 'an amazing destination';
+        
+        let durationStr = null;
+        if (trip.duration) {
+            const days = trip.duration;
+            const nights = days > 1 ? days - 1 : 0;
+            durationStr = nights > 0 ? `${days} Days / ${nights} Nights` : `${days} Day`;
+        }
+
+        const travelers = trip.travelers || null;
+
+        // Budget: map tier to friendly label, prefer estimated cost from tripData
+        const budgetMap = { low: 'Budget-Friendly', moderate: 'Moderate', premium: 'Premium' };
+        const estimatedCost = trip.tripData?.estimatedBudget || trip.tripData?.totalBudget || trip.tripData?.budget;
+        const budget = estimatedCost ? String(estimatedCost) : (budgetMap[trip.budget] || trip.budget || null);
+
+        // Travel style (capitalize first letter)
+        const travelStyle = trip.travelStyle
+            ? trip.travelStyle.charAt(0).toUpperCase() + trip.travelStyle.slice(1)
+            : null;
+
+        // Trip URL
+        const tripUrl = `https://mygotrip.online/trip/${trip._id || id}`;
+
+        // Build premium message matching exact requested format (using ES6 Unicode code points)
+        let message = `\u{1F30D} *Your GoTrip Itinerary is Ready!* \u{2708}\u{FE0F}\n\n`;
+        message += `Hey \u{1F44B}\n\n`;
+        message += `Your personalized trip to *${destination}* is all set and ready to explore!\n\n`;
+        message += `---------------------------------------\n`;
+        
+        message += `\u{1F4CD} *Destination:* ${destination}\n`;
+        if (durationStr) message += `\u{1F4C5} *Duration:* ${durationStr}\n`;
+        if (travelers) message += `\u{1F465} *Travelers:* ${travelers} People\n`;
+        if (budget) message += `\u{1F4B0} *Budget:* ${budget}\n`;
+        if (travelStyle) message += `\u{1F392} *Travel Style:* ${travelStyle}\n`;
+        message += `---------------------------------------\n`;
+
+        message += `\u{2728} *Trip Highlights*\n`;
+        message += `\u{2022} Curated places to visit\n`;
+        message += `\u{2022} Smart budget planning\n`;
+        message += `\u{2022} Recommended stays & activities\n`;
+        message += `\u{2022} Travel tips for smoother journey\n`;
+        message += `---------------------------------------\n\n`;
+        
+        message += `\u{1F517} *View Full Trip Details:*\n`;
+        message += `${tripUrl}\n\n`;
+        
+        message += `Happy travels \u{1F334}\n`;
+        message += `*Planned with GoTrip* \u{1F30D}`;
+
+        // Open WhatsApp Click-to-Chat in new tab using official API endpoint
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+    };
 
     // Email delivery hook
     const tripEmail = useTripEmail(id);
@@ -207,11 +264,12 @@ export default function TripResult() {
                         )}
                     </button>
 
-                    {/* WhatsApp button — only for trip owner */}
+                    {/* WhatsApp Click-to-Chat share — opens wa.me directly */}
                     {isOwner && (
                         <button
-                            onClick={whatsapp.open}
-                            aria-label="Receive trip on WhatsApp"
+                            onClick={handleShareWhatsApp}
+                            aria-label="Share trip on WhatsApp"
+                            id="share-whatsapp-btn"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -237,7 +295,7 @@ export default function TripResult() {
                             }}
                         >
                             <FaWhatsapp size={16} />
-                            Receive on WhatsApp
+                            Share on WhatsApp
                         </button>
                     )}
 
@@ -321,16 +379,7 @@ export default function TripResult() {
                 error={collab.error}
             />
 
-            {/* WhatsApp Modal */}
-            <WhatsAppModal
-                isOpen={whatsapp.isOpen}
-                onClose={whatsapp.close}
-                onSend={whatsapp.send}
-                sending={whatsapp.sending}
-                error={whatsapp.error}
-                success={whatsapp.success}
-                destination={trip.destination}
-            />
+            {/* WhatsApp: No modal needed — Click-to-Chat opens wa.me directly */}
 
             {/* Email Modal */}
             <TripEmailModal

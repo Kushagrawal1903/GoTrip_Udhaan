@@ -19,7 +19,6 @@ const createCollaborateRouter = require('./routes/collaborate');
 const dashboardRoutes = require('./routes/dashboard');
 const notificationRoutes = require('./routes/notifications');
 const exploreRoutes = require('./routes/explore');
-const whatsappRoutes = require('./routes/whatsapp');
 const emailRoutes = require('./routes/email');
 
 // Initialize Express app and HTTP server
@@ -98,8 +97,7 @@ app.use('/api/notifications', notificationRoutes);
 // Explore / Discover destinations routes
 app.use('/api/explore', exploreRoutes);
 
-// WhatsApp trip delivery routes
-app.use('/api/whatsapp', whatsappRoutes);
+// WhatsApp: Removed — now uses client-side Click-to-Chat (wa.me links)
 
 // Email trip delivery routes
 app.use('/api/email', emailRoutes);
