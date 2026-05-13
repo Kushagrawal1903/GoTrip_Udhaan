@@ -5,11 +5,14 @@ import api from '../services/api';
 import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
 import CollaboratorPanel from '../components/CollaboratorPanel';
+import WhatsAppModal from '../components/trip/WhatsAppModal';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import usePackingList from '../hooks/usePackingList';
 import useCollaboration from '../hooks/useCollaboration';
 import useSocket from '../hooks/useSocket';
+import useWhatsApp from '../hooks/useWhatsApp';
+import { FaWhatsapp } from 'react-icons/fa';
 
 /**
  * TripResult — view a single saved trip with packing list, PDF export, and collaboration
@@ -32,6 +35,9 @@ export default function TripResult() {
 
     // Collaboration hook
     const collab = useCollaboration(id, isOwner);
+
+    // WhatsApp hook
+    const whatsapp = useWhatsApp(id);
 
     // Socket.io for real-time collaboration
     useSocket(id, {
@@ -196,6 +202,40 @@ export default function TripResult() {
                         )}
                     </button>
 
+                    {/* WhatsApp button — only for trip owner */}
+                    {isOwner && (
+                        <button
+                            onClick={whatsapp.open}
+                            aria-label="Receive trip on WhatsApp"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 7,
+                                padding: '8px 20px',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                color: '#fff',
+                                background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                                border: 'none',
+                                borderRadius: 10,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 8px rgba(37, 211, 102, 0.25)',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(37, 211, 102, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(37, 211, 102, 0.25)';
+                            }}
+                        >
+                            <FaWhatsapp size={16} />
+                            Receive on WhatsApp
+                        </button>
+                    )}
+
                     <button
                         className="btn-outline"
                         onClick={() => navigate('/plan')}
@@ -240,6 +280,17 @@ export default function TripResult() {
                 onAddComment={collab.addComment}
                 onHandleComment={collab.handleComment}
                 error={collab.error}
+            />
+
+            {/* WhatsApp Modal */}
+            <WhatsAppModal
+                isOpen={whatsapp.isOpen}
+                onClose={whatsapp.close}
+                onSend={whatsapp.send}
+                sending={whatsapp.sending}
+                error={whatsapp.error}
+                success={whatsapp.success}
+                destination={trip.destination}
             />
         </div>
     );

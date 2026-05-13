@@ -19,6 +19,7 @@ const createCollaborateRouter = require('./routes/collaborate');
 const dashboardRoutes = require('./routes/dashboard');
 const notificationRoutes = require('./routes/notifications');
 const exploreRoutes = require('./routes/explore');
+const whatsappRoutes = require('./routes/whatsapp');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -95,6 +96,9 @@ app.use('/api/notifications', notificationRoutes);
 
 // Explore / Discover destinations routes
 app.use('/api/explore', exploreRoutes);
+
+// WhatsApp trip delivery routes
+app.use('/api/whatsapp', whatsappRoutes);
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 

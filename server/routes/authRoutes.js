@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
+const { sendWelcomeEmail } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -179,6 +180,13 @@ router.post('/google', async (req, res, next) => {
                 email,
                 googleId,
             });
+
+            // Send welcome email (fire-and-forget — never blocks login)
+            try {
+                await sendWelcomeEmail({ name: user.name, email: user.email });
+            } catch (emailErr) {
+                console.error('❌ Failed to send welcome email:', emailErr.message);
+            }
         }
 
         // Generate JWT
