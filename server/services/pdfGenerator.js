@@ -286,29 +286,10 @@ async function generatePDF(trip) {
     try {
         const html = buildPDFHTML(trip);
 
-        // Use @sparticuz/chromium for serverless, or local Chrome for dev
-        let chromiumArgs;
-        let executablePath;
-        try {
-            const chromium = require('@sparticuz/chromium');
-            executablePath = await chromium.executablePath();
-            chromiumArgs = chromium.args;
-        } catch (_) {
-            // Fallback for local development — use system Chrome or puppeteer
-            executablePath = null;
-            chromiumArgs = ['--no-sandbox', '--disable-setuid-sandbox'];
-        }
-
-        const puppeteer = require('puppeteer-core');
+        // Try to use standard puppeteer (which we just installed)
+        const puppeteer = require('puppeteer');
         browser = await puppeteer.launch({
-            args: chromiumArgs,
-            executablePath: executablePath || (
-                process.platform === 'win32'
-                    ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-                    : process.platform === 'darwin'
-                        ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-                        : '/usr/bin/google-chrome-stable'
-            ),
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
             headless: 'new',
         });
 
