@@ -40,62 +40,72 @@ export default function TripResult() {
      * Share on WhatsApp — Click-to-Chat (no API, no modal, no phone input).
      * Generates a premium pre-filled message and opens wa.me in a new tab.
      */
-    const handleShareWhatsApp = () => {
+    const handleShareWhatsApp = async () => {
         if (!trip) return;
 
-        const destination = trip.destination || 'an amazing destination';
-        
-        let durationStr = null;
-        if (trip.duration) {
-            const days = trip.duration;
-            const nights = days > 1 ? days - 1 : 0;
-            durationStr = nights > 0 ? `${days} Days / ${nights} Nights` : `${days} Day`;
+        try {
+            // 1. Get or generate the public shareId from backend
+            const res = await api.post(`/trips/${id}/share`);
+            const shareId = res.data.data.shareId;
+            
+            // 2. Build the public trip URL
+            const clientUrl = import.meta.env.VITE_CLIENT_URL || window.location.origin;
+            const tripUrl = `${clientUrl}/share/${shareId}`;
+
+            const destination = trip.destination || 'an amazing destination';
+            
+            let durationStr = null;
+            if (trip.duration) {
+                const days = trip.duration;
+                const nights = days > 1 ? days - 1 : 0;
+                durationStr = nights > 0 ? `${days} Days / ${nights} Nights` : `${days} Day`;
+            }
+
+            const travelers = trip.travelers || null;
+
+            // Budget: map tier to friendly label, prefer estimated cost from tripData
+            const budgetMap = { low: 'Budget-Friendly', moderate: 'Moderate', premium: 'Premium' };
+            const estimatedCost = trip.tripData?.estimatedBudget || trip.tripData?.totalBudget || trip.tripData?.budget;
+            const budget = estimatedCost ? String(estimatedCost) : (budgetMap[trip.budget] || trip.budget || null);
+
+            // Travel style (capitalize first letter)
+            const travelStyle = trip.travelStyle
+                ? trip.travelStyle.charAt(0).toUpperCase() + trip.travelStyle.slice(1)
+                : null;
+
+            // Build premium message matching exact requested format (using ES6 Unicode code points)
+            let message = `\u{1F30D} *Your GoTrip Itinerary is Ready!* \u{2708}\u{FE0F}\n\n`;
+            message += `Hey \u{1F44B}\n\n`;
+            message += `Your personalized trip to *${destination}* is all set and ready to explore!\n\n`;
+            message += `---------------------------------------\n`;
+            
+            message += `\u{1F4CD} *Destination:* ${destination}\n`;
+            if (durationStr) message += `\u{1F4C5} *Duration:* ${durationStr}\n`;
+            if (travelers) message += `\u{1F465} *Travelers:* ${travelers} People\n`;
+            if (budget) message += `\u{1F4B0} *Budget:* ${budget}\n`;
+            if (travelStyle) message += `\u{1F392} *Travel Style:* ${travelStyle}\n`;
+            message += `---------------------------------------\n`;
+
+            message += `\u{2728} *Trip Highlights*\n`;
+            message += `\u{2022} Curated places to visit\n`;
+            message += `\u{2022} Smart budget planning\n`;
+            message += `\u{2022} Recommended stays & activities\n`;
+            message += `\u{2022} Travel tips for smoother journey\n`;
+            message += `---------------------------------------\n\n`;
+            
+            message += `\u{1F517} *View Full Trip Details:*\n`;
+            message += `${tripUrl}\n\n`;
+            
+            message += `Happy travels \u{1F334}\n`;
+            message += `*Planned with GoTrip* \u{1F30D}`;
+
+            // Open WhatsApp Click-to-Chat in new tab using official API endpoint
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank', 'noopener,noreferrer');
+        } catch (error) {
+            console.error('Failed to generate share link:', error);
+            alert('Could not generate share link. Please try again.');
         }
-
-        const travelers = trip.travelers || null;
-
-        // Budget: map tier to friendly label, prefer estimated cost from tripData
-        const budgetMap = { low: 'Budget-Friendly', moderate: 'Moderate', premium: 'Premium' };
-        const estimatedCost = trip.tripData?.estimatedBudget || trip.tripData?.totalBudget || trip.tripData?.budget;
-        const budget = estimatedCost ? String(estimatedCost) : (budgetMap[trip.budget] || trip.budget || null);
-
-        // Travel style (capitalize first letter)
-        const travelStyle = trip.travelStyle
-            ? trip.travelStyle.charAt(0).toUpperCase() + trip.travelStyle.slice(1)
-            : null;
-
-        // Trip URL
-        const tripUrl = `https://mygotrip.online/trip/${trip._id || id}`;
-
-        // Build premium message matching exact requested format (using ES6 Unicode code points)
-        let message = `\u{1F30D} *Your GoTrip Itinerary is Ready!* \u{2708}\u{FE0F}\n\n`;
-        message += `Hey \u{1F44B}\n\n`;
-        message += `Your personalized trip to *${destination}* is all set and ready to explore!\n\n`;
-        message += `---------------------------------------\n`;
-        
-        message += `\u{1F4CD} *Destination:* ${destination}\n`;
-        if (durationStr) message += `\u{1F4C5} *Duration:* ${durationStr}\n`;
-        if (travelers) message += `\u{1F465} *Travelers:* ${travelers} People\n`;
-        if (budget) message += `\u{1F4B0} *Budget:* ${budget}\n`;
-        if (travelStyle) message += `\u{1F392} *Travel Style:* ${travelStyle}\n`;
-        message += `---------------------------------------\n`;
-
-        message += `\u{2728} *Trip Highlights*\n`;
-        message += `\u{2022} Curated places to visit\n`;
-        message += `\u{2022} Smart budget planning\n`;
-        message += `\u{2022} Recommended stays & activities\n`;
-        message += `\u{2022} Travel tips for smoother journey\n`;
-        message += `---------------------------------------\n\n`;
-        
-        message += `\u{1F517} *View Full Trip Details:*\n`;
-        message += `${tripUrl}\n\n`;
-        
-        message += `Happy travels \u{1F334}\n`;
-        message += `*Planned with GoTrip* \u{1F30D}`;
-
-        // Open WhatsApp Click-to-Chat in new tab using official API endpoint
-        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-        window.open(waUrl, '_blank', 'noopener,noreferrer');
     };
 
     // Email delivery hook

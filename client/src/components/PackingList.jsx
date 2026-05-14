@@ -194,11 +194,13 @@ export default function PackingList({ packingList, generating, error, onGenerate
                                             <input
                                                 type="checkbox"
                                                 checked={item.checked || false}
-                                                onChange={() => onToggle(catIdx, itemIdx, !item.checked)}
+                                                onChange={() => onToggle && onToggle(catIdx, itemIdx, !item.checked)}
+                                                disabled={!onToggle}
                                                 aria-label={`Mark ${item.name} as ${item.checked ? 'unpacked' : 'packed'}`}
                                                 style={{
                                                     width: 18, height: 18, accentColor: 'var(--color-primary)',
-                                                    cursor: 'pointer', flexShrink: 0,
+                                                    cursor: onToggle ? 'pointer' : 'default', flexShrink: 0,
+                                                    opacity: onToggle ? 1 : 0.7
                                                 }}
                                             />
                                             <div style={{ flex: 1, minWidth: 0 }}>

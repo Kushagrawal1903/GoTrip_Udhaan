@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import PlanTrip from './pages/PlanTrip';
 import TripResult from './pages/TripResult';
+import PublicTripResult from './pages/PublicTripResult';
 import JoinTrip from './pages/JoinTrip';
 import DashboardLayout from './layouts/DashboardLayout';
 
@@ -124,6 +125,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/share/:shareId" element={<PublicTripResult />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
