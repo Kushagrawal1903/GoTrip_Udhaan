@@ -252,7 +252,10 @@ body { font-family: 'Inter', sans-serif; color: #1a1a2e; font-size: 13px; line-h
         ${tripData?.totalEstimatedBudget ? `<span class="cover-tag">${tripData.totalEstimatedBudget}</span>` : ''}
     </div>
     <div class="cover-footer">
-        <span>GoTrip Pro — AI Smart Travel Planner</span>
+        <div style="text-align: left">
+            <div>GoTrip Pro — AI Smart Travel Planner</div>
+            ${trip.shareId && trip.isPublic ? `<div style="margin-top: 4px; font-size: 11px;">View online: https://mygotrip.online/share/${trip.shareId}</div>` : ''}
+        </div>
         <span>Generated: ${generatedDate}</span>
     </div>
 </div>

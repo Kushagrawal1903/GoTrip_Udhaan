@@ -85,8 +85,16 @@ router.post('/send-trip', auth, async (req, res, next) => {
 
         const travelers = trip.travelers || 1;
 
+        // Ensure the trip has a shareId and is public
+        const crypto = require('crypto');
+        if (!trip.shareId) {
+            trip.shareId = crypto.randomBytes(4).toString('hex');
+        }
+        trip.isPublic = true;
+        await trip.save();
+
         const clientUrl = process.env.CLIENT_URL || 'https://mygotrip.online';
-        const tripUrl = `${clientUrl}/trip/${trip._id}`;
+        const tripUrl = `${clientUrl}/share/${trip.shareId}`;
 
         // ─── Send via Resend ────────────────────────────────────
         await sendTripEmail({

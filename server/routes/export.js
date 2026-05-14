@@ -36,6 +36,21 @@ router.post('/pdf/:tripId', auth, async (req, res, next) => {
             });
         }
 
+        // Ensure the trip has a shareId and is public so the PDF link works
+        const crypto = require('crypto');
+        let shouldSave = false;
+        if (!trip.shareId) {
+            trip.shareId = crypto.randomBytes(4).toString('hex');
+            shouldSave = true;
+        }
+        if (!trip.isPublic) {
+            trip.isPublic = true;
+            shouldSave = true;
+        }
+        if (shouldSave) {
+            await trip.save();
+        }
+
         // Generate PDF buffer
         const pdfBuffer = await generatePDF(trip);
 

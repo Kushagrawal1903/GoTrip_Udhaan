@@ -211,4 +211,45 @@ router.delete('/:id', auth, async (req, res, next) => {
     }
 });
 
+/**
+ * POST /api/trips/:id/share
+ * Enables public sharing for a trip and returns the secure shareId
+ */
+router.post('/:id/share', auth, async (req, res, next) => {
+    try {
+        const crypto = require('crypto');
+        
+        // Find trip — owner only
+        const trip = await Trip.findOne({
+            _id: req.params.id,
+            userId: req.userId,
+        });
+
+        if (!trip) {
+            return res.status(404).json({
+                success: false,
+                message: 'Trip not found or unauthorized.',
+            });
+        }
+
+        // Enable public sharing and ensure a shareId exists
+        trip.isPublic = true;
+        if (!trip.shareId) {
+            trip.shareId = crypto.randomBytes(4).toString('hex'); // 8 char hex string
+        }
+
+        await trip.save();
+
+        res.json({
+            success: true,
+            message: 'Trip is now public.',
+            data: {
+                shareId: trip.shareId,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

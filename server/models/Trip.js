@@ -96,6 +96,9 @@ const tripSchema = new mongoose.Schema(
             createdAt: { type: Date, default: Date.now },
         }],
         shareToken: { type: String, unique: true, sparse: true },
+        // ─── FEATURE 4: Public Trip Sharing ────────────
+        shareId: { type: String, unique: true, sparse: true },
+        isPublic: { type: Boolean, default: false },
     },
     {
         timestamps: true,
