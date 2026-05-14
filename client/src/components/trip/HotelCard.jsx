@@ -15,7 +15,7 @@ export default function HotelCard({ hotel, index = 0 }) {
     }
 
     return (
-        <div className="glass-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <div className="glass-card itinerary-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             {/* Photo Section */}
             <div style={{
                 height: 180,

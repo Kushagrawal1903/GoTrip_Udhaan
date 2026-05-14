@@ -20,7 +20,7 @@ export default function Collaborations() {
     });
 
     return (
-        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', paddingBottom: 40 }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 20 }}>
                 Trips you're collaborating on or have shared with others.
             </p>

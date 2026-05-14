@@ -22,7 +22,7 @@ export default function Navbar() {
     const showSolid = !isHome || scrolled;
 
     return (
-        <nav style={{
+        <nav className="navbar-responsive" style={{
             position: 'sticky',
             top: 0,
             zIndex: 100,
@@ -40,7 +40,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" style={{
                 display: 'flex', alignItems: 'center', gap: 8,
-                textDecoration: 'none',
+                textDecoration: 'none', flexShrink: 0,
             }}>
                 <span style={{
                     fontWeight: 800,
@@ -55,7 +55,7 @@ export default function Navbar() {
 
             {/* Center Links */}
             {isAuthenticated && (
-                <div style={{
+                <div className="nav-center-desktop" style={{
                     display: 'flex', gap: 4,
                     position: 'absolute', left: '50%', transform: 'translateX(-50%)',
                 }}>
@@ -87,24 +87,27 @@ export default function Navbar() {
             )}
 
             {/* Right side */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <ThemeToggle />
-
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {isAuthenticated ? (
                     <>
                         <span style={{
-                            fontSize: '0.85rem',
+                            fontSize: '0.8rem',
                             color: isHome && !scrolled ? 'rgba(255,255,255,0.85)' : 'var(--text-secondary)',
-                            fontWeight: 500,
-                            padding: '6px 12px',
-                            borderRadius: 8,
+                            fontWeight: 600,
+                            padding: '4px 10px',
+                            borderRadius: 6,
                             background: showSolid ? 'var(--bg-glass)' : 'rgba(255,255,255,0.1)',
                             border: '1px solid var(--border-color)',
                             transition: 'all 0.3s',
+                            whiteSpace: 'nowrap',
                         }}>
                             {user?.name?.split(' ')[0]}
                         </span>
+                        
+                        <ThemeToggle />
+
                         <button
+                            className="nav-user-desktop"
                             onClick={logout}
                             style={{
                                 padding: '8px 18px',
@@ -125,6 +128,7 @@ export default function Navbar() {
                     </>
                 ) : (
                     <>
+                        <ThemeToggle />
                         <Link
                             to="/login"
                             style={{

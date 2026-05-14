@@ -205,32 +205,42 @@ export default function TripResult() {
         <div className="animate-fade-in-up" style={{ padding: '40px 24px' }}>
             {/* Back + Action buttons */}
             <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
                 maxWidth: 1000,
                 margin: '0 auto 24px',
-                flexWrap: 'wrap',
-                gap: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
             }}>
-                <Link to="/dashboard" style={{
-                    color: 'var(--color-primary)',
-                    fontWeight: 600,
-                    fontSize: '0.88rem',
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '7px 14px',
-                    borderRadius: 8,
-                    background: 'rgba(13, 148, 136, 0.06)',
-                    border: '1px solid rgba(13, 148, 136, 0.12)',
-                    transition: 'all 0.2s',
-                }}>
-                    ← Back to My Trips
-                </Link>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Link to="/dashboard" style={{
+                        color: 'var(--color-primary)',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        textDecoration: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '6px 12px',
+                        borderRadius: 8,
+                        background: 'rgba(13, 148, 136, 0.06)',
+                        border: '1px solid rgba(13, 148, 136, 0.12)',
+                        transition: 'all 0.2s',
+                    }}>
+                        ← Back
+                    </Link>
+                    
+                    {/* Compact mobile info? No, keep it simple */}
+                </div>
 
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div className="mobile-action-scroll" style={{ 
+                    display: 'flex', 
+                    gap: 10, 
+                    overflowX: 'auto', 
+                    padding: '4px 0 12px',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch'
+                }}>
                     {/* Export PDF button */}
                     <button
                         className="btn-primary"
@@ -251,7 +261,7 @@ export default function TripResult() {
 
                     {/* Collaborate button */}
                     <button
-                        className="btn-outline"
+                        className="btn-primary"
                         onClick={() => setCollabOpen(true)}
                         aria-label="Open collaboration panel"
                         style={{
@@ -265,9 +275,10 @@ export default function TripResult() {
                             <span style={{
                                 position: 'absolute', top: -6, right: -6,
                                 width: 20, height: 20, borderRadius: '50%',
-                                background: 'var(--color-primary)', color: '#fff',
+                                background: 'var(--color-primary-dark)', color: '#fff',
                                 fontSize: '0.65rem', fontWeight: 700,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                border: '2px solid #fff',
                             }}>
                                 {collabCount}
                             </span>

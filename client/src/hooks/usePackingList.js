@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../services/api';
 
 /**
@@ -10,10 +10,12 @@ export default function usePackingList(tripId, existingPackingList = null) {
     const [packingList, setPackingList] = useState(existingPackingList);
     const [generating, setGenerating] = useState(false);
     const [error, setError] = useState('');
+    const autoGenTriggered = useRef(false);
 
     useEffect(() => {
         if (existingPackingList && existingPackingList.categories?.length > 0) {
             setPackingList(existingPackingList);
+            autoGenTriggered.current = true; // already have one, skip auto-gen
         }
     }, [existingPackingList]);
 
@@ -29,6 +31,14 @@ export default function usePackingList(tripId, existingPackingList = null) {
             setGenerating(false);
         }
     }, [tripId]);
+
+    // Auto-generate packing list if one doesn't exist yet
+    useEffect(() => {
+        if (tripId && !autoGenTriggered.current && !packingList && !generating) {
+            autoGenTriggered.current = true;
+            generate();
+        }
+    }, [tripId, packingList, generating, generate]);
 
     const toggleItem = useCallback(async (categoryIndex, itemIndex, checked) => {
         // Optimistic update

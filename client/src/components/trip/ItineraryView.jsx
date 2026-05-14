@@ -15,17 +15,18 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
     const showHeroImg = destinationImage && !heroImgFailed;
 
     return (
-        <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto' }} className="mobile-p-md">
             <div className="animate-fade-in-up">
 
                 {/* ─── DESTINATION HERO BANNER ───────────────────── */}
                 <div style={{
-                    borderRadius: 12,
+                    borderRadius: 16,
                     overflow: 'hidden',
-                    marginBottom: 28,
+                    marginBottom: 24,
                     position: 'relative',
-                    height: 260,
+                    height: 'clamp(200px, 30vh, 280px)',
                     background: '#1e293b',
+                    boxShadow: 'var(--shadow-lg)',
                 }}>
                     {showHeroImg && (
                         <img
@@ -42,58 +43,97 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                     {/* Overlay */}
                     <div style={{
                         position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.25) 100%)',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.3) 100%)',
                         pointerEvents: 'none',
                     }} />
                     {/* Text */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px 28px', zIndex: 1 }}>
+                    <div style={{ 
+                        position: 'absolute', bottom: 0, left: 0, right: 0, 
+                        padding: 'clamp(16px, 4vw, 28px)', 
+                        zIndex: 1 
+                    }}>
                         <h1 style={{
                             fontWeight: 800,
-                            fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                            fontSize: 'clamp(1.5rem, 5vw, 2.4rem)',
                             color: '#fff', marginBottom: 8,
                             letterSpacing: '-0.02em',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
                         }}>
                             {tripData.destination}
                         </h1>
-                        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                            <span style={{
-                                padding: '5px 14px', borderRadius: 6,
-                                background: 'rgba(255,255,255,0.18)',
-                                color: '#fff', fontSize: '0.82rem', fontWeight: 600,
-                            }}>{tripData.duration} Days</span>
-                            {tripData.travelers && tripData.travelers > 0 && (
-                                <span style={{
-                                    padding: '5px 14px', borderRadius: 6,
-                                    background: 'rgba(255,255,255,0.18)',
-                                    color: '#fff', fontSize: '0.82rem', fontWeight: 600,
-                                }}>{tripData.travelers} {tripData.travelers === 1 ? 'Traveler' : 'Travelers'}</span>
-                            )}
-                            <span style={{
-                                padding: '5px 14px', borderRadius: 6,
-                                background: 'rgba(255,255,255,0.18)',
-                                color: '#fff', fontSize: '0.82rem', fontWeight: 600, textTransform: 'capitalize',
-                            }}>{tripData.budgetCategory}</span>
-                            {tripData.totalEstimatedBudget && (
-                                <span style={{
-                                    padding: '5px 14px', borderRadius: 6,
-                                    background: 'rgba(217,119,6,0.85)',
-                                    color: '#fff', fontSize: '0.82rem', fontWeight: 700,
-                                }}>
-                                    {tripData.totalEstimatedBudget}
-                                </span>
-                            )}
-                        </div>
                     </div>
                 </div>
 
+                {/* ─── TRIP OVERVIEW BADGES ──────────────────────── */}
+                <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+                    {/* Top row: Days, Travelers, Category */}
+                    <div style={{ 
+                        display: 'flex', gap: 8, flexWrap: 'nowrap', 
+                        overflowX: 'auto', width: '100%', justifyContent: 'center',
+                        scrollbarWidth: 'none', msOverflowStyle: 'none',
+                        padding: '0 4px'
+                    }} className="no-scrollbar">
+                        {[
+                            { val: `${tripData.duration} Days`, icon: '📅' },
+                            { val: `${tripData.travelers} ${tripData.travelers === 1 ? 'Traveler' : 'Travelers'}`, icon: '👤', hide: !tripData.travelers },
+                            { val: tripData.budgetCategory, icon: '💰' }
+                        ].map((badge, idx) => !badge.hide && (
+                            <div key={idx} style={{
+                                padding: '6px 12px', borderRadius: 10,
+                                background: 'var(--bg-card)',
+                                color: 'var(--text-primary)',
+                                fontSize: '0.78rem', fontWeight: 700,
+                                border: '1px solid var(--border-color)',
+                                boxShadow: 'var(--shadow-sm)',
+                                display: 'flex', alignItems: 'center', gap: 5,
+                                whiteSpace: 'nowrap', flexShrink: 0,
+                            }}>
+                                <span style={{ opacity: 0.8 }}>{badge.icon}</span>
+                                {badge.val}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Bottom row: Detailed Budget Range (Full width/prominent) */}
+                    {tripData.totalEstimatedBudget && (
+                        <div style={{
+                            padding: '12px 20px', borderRadius: 14,
+                            background: 'var(--bg-card)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.85rem', fontWeight: 600,
+                            border: '1.5px solid var(--color-primary)',
+                            boxShadow: 'var(--shadow-sm)',
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            textAlign: 'center', maxWidth: '100%',
+                            lineHeight: 1.4,
+                        }}>
+                            <span style={{ 
+                                background: 'rgba(13, 148, 136, 0.1)', 
+                                padding: '6px', borderRadius: '50%',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <span style={{ fontSize: '1.1rem' }}>✨</span>
+                            </span>
+                            <div style={{ textAlign: 'left' }}>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: 2 }}>
+                                    Estimated Total Budget
+                                </span>
+                                <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                                    {tripData.totalEstimatedBudget}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {/* ─── ACTION BUTTONS ────────────────────────────── */}
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 32, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
                     {onSave && (
                         <button
                             className="btn-primary"
                             onClick={onSave}
                             disabled={saving}
-                            style={{ padding: '14px 36px', fontSize: '1rem' }}
+                            style={{ padding: '12px 32px', fontSize: '0.95rem', width: '100%', maxWidth: 300 }}
                         >
                             {saving ? 'Saving...' : 'Save Trip to Dashboard'}
                         </button>
@@ -119,7 +159,7 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                         }}>
                             Getting There & Around
                         </h3>
-                        <div style={{
+                        <div className="transport-grid" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                             gap: 16,
@@ -161,7 +201,7 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                         }}>
                             Recommended Hotels
                         </h3>
-                        <div className="stagger-children" style={{
+                        <div className="hotel-grid stagger-children" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                             gap: 18,
@@ -201,7 +241,7 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                         }}>
                             Travel Tips
                         </h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
+                        <div className="tips-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 10 }}>
                             {tripData.tips.map((tip, i) => (
                                 <div key={i} style={{
                                     padding: '12px 16px', borderRadius: 8,

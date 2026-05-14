@@ -29,6 +29,7 @@ export default function CollaborationsPanel({ userId }) {
         <div style={{
             borderRadius: 12, border: '1px solid var(--border-color)',
             background: 'var(--bg-card)', overflow: 'hidden', marginTop: 16,
+            marginBottom: 24, // Added bottom margin
         }}>
             <div style={{
                 padding: '16px 18px', borderBottom: '1px solid var(--border-color)',

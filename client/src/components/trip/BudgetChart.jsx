@@ -62,7 +62,7 @@ export default function BudgetChart({ budgetBreakdown, totalBudget }) {
     };
 
     return (
-        <div className="glass-card" style={{ padding: '24px 28px' }}>
+        <div className="glass-card itinerary-card" style={{ padding: '24px 28px' }}>
             <h3 style={{
                 fontWeight: 700,
                 fontSize: '1.1rem',
@@ -81,7 +81,7 @@ export default function BudgetChart({ budgetBreakdown, totalBudget }) {
                 </p>
             )}
 
-            <div style={{
+            <div className="budget-chart-container" style={{
                 display: 'grid',
                 gridTemplateColumns: 'minmax(180px, 240px) 1fr',
                 gap: 28,
@@ -111,7 +111,7 @@ export default function BudgetChart({ budgetBreakdown, totalBudget }) {
                 </div>
 
                 {/* Category cards */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="budget-categories" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     {categories.map((cat, i) => {
                         const val = values[i];
                         const pct = total > 0 ? ((val / total) * 100).toFixed(0) : 0;

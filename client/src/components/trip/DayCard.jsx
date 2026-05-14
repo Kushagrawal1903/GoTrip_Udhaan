@@ -20,10 +20,10 @@ function buildMapsLink(placeName, destination) {
 
 export default function DayCard({ day, destination }) {
     return (
-        <div className="glass-card" style={{ overflow: 'hidden' }}>
+        <div className="glass-card itinerary-card" style={{ overflow: 'hidden' }}>
             {/* Day Header */}
             <div style={{
-                padding: '16px 24px',
+                padding: '12px 20px', // Reduced for mobile
                 background: 'var(--color-primary)',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -34,14 +34,14 @@ export default function DayCard({ day, destination }) {
                 <div>
                     <span style={{
                         fontWeight: 700,
-                        fontSize: '1.05rem',
+                        fontSize: '1rem',
                         color: '#fff',
                     }}>
                         Day {day.day}
                     </span>
                     <span style={{
                         marginLeft: 10,
-                        fontSize: '0.9rem',
+                        fontSize: '0.85rem',
                         color: 'rgba(255,255,255,0.8)',
                         fontWeight: 400,
                     }}>
@@ -50,11 +50,11 @@ export default function DayCard({ day, destination }) {
                 </div>
                 {day.estimatedDayCost && (
                     <span style={{
-                        padding: '4px 14px',
+                        padding: '3px 12px',
                         background: 'rgba(255,255,255,0.18)',
                         borderRadius: 6,
                         color: '#fff',
-                        fontSize: '0.82rem',
+                        fontSize: '0.78rem',
                         fontWeight: 600,
                     }}>
                         {day.estimatedDayCost}
@@ -63,7 +63,7 @@ export default function DayCard({ day, destination }) {
             </div>
 
             {/* Activities Timeline */}
-            <div style={{ padding: '20px 24px' }}>
+            <div style={{ padding: '16px 20px' }}>
                 {day.activities?.map((act, i) => {
                     const timeKey = (act.time || '').toLowerCase();
                     const dotColor = TIME_COLORS[timeKey] || '#0d9488';
@@ -158,12 +158,12 @@ export default function DayCard({ day, destination }) {
             {/* Meals */}
             {day.meals && (
                 <div style={{
-                    padding: '14px 24px',
+                    padding: '12px 20px',
                     borderTop: '1px solid var(--border-color)',
                     background: 'var(--bg-glass)',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-                    gap: 10,
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', // Narrower for mobile
+                    gap: 12,
                 }}>
                     {Object.entries(day.meals).map(([meal, detail]) => (
                         <div key={meal} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

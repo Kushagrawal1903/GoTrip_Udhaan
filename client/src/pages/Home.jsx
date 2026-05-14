@@ -176,7 +176,7 @@ export default function Home() {
                         borderTop: '1px solid rgba(255,255,255,0.06)',
                     }}>
                         {STATS.map((s, i) => (
-                            <div key={s.label} style={{
+                            <div key={s.label} className="mobile-stat-item" style={{
                                 padding: '10px 32px',
                                 borderRight: i < STATS.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
                             }}>

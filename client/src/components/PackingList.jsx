@@ -133,7 +133,7 @@ export default function PackingList({ packingList, generating, error, onGenerate
             {/* Categories grid */}
             <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', // More flexible for mobile
                 gap: 14,
             }}>
                 {packingList.categories.map((category, catIdx) => {
@@ -149,7 +149,7 @@ export default function PackingList({ packingList, generating, error, onGenerate
                                 aria-label={`Toggle ${category.name} category`}
                                 aria-expanded={!isCollapsed}
                                 style={{
-                                    width: '100%', padding: '14px 18px',
+                                    width: '100%', padding: '12px 16px',
                                     display: 'flex', alignItems: 'center', gap: 10,
                                     background: 'transparent', border: 'none', cursor: 'pointer',
                                     textAlign: 'left', color: 'var(--text-primary)',

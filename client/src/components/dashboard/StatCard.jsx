@@ -3,7 +3,7 @@ const STAT_COLORS = ['#0d9488', '#3b82f6', '#d97706', '#8b5cf6'];
 
 export default function StatCard({ index = 0, label, value, subtext, subtextColor }) {
     return (
-        <div style={{
+        <div className="dashboard-stat-card" style={{
             padding: '20px', borderRadius: 12,
             background: 'var(--bg-card)', border: '1px solid var(--border-color)',
             boxShadow: 'var(--shadow-sm)',
