@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="https://via.placeholder.com/150x150/0d9488/ffffff?text=GoTrip+Logo" alt="GoTrip Logo" width="120" height="120">
+  <img src="screenshots/logo.jpeg" alt="GoTrip Logo" width="120" height="120">
 
-  # 🌍 GoTrip Pro
+  # 🌍 GoTrip
   **AI-Powered Travel Itinerary Planner & Real-Time Collaboration Platform**
 
   [![MERN Stack](https://img.shields.io/badge/Stack-MERN-38B2AC?style=for-the-badge&logo=mongodb)](https://mongodb.com/)
@@ -20,12 +20,19 @@
 ## ✨ Features
 
 - 🤖 **AI-Curated Itineraries**: Generate complete, personalized day-by-day itineraries tailored to your travel style, budget, and group size using the **Google Gemini AI API**.
+
 - ✏️ **Inline Itinerary Editing**: Fully editable, hover-triggered React UI to manually tweak AI-generated slots without page reloads.
+
 - 👥 **Real-Time Collaboration**: Invite friends to view, edit, and contribute to the itinerary. Changes sync instantly via **Socket.io**.
+
 - 📊 **Dynamic Dashboard & Analytics**: Track your travel stats, regions visited, collaborator counts, and upcoming trips with animated, responsive UI components.
+
 - 📱 **WhatsApp & Email Sharing**: Instantly share trips via **WhatsApp Click-to-Chat** or beautifully styled **Resend** HTML emails. No account required for recipients!
+
 - 📄 **PDF Export**: Generate professional, formatted PDF versions of your itineraries for offline use.
+
 - 🔒 **Secure Authentication**: Traditional Email/Password (bcrypt + JWT) and seamless **Google OAuth** integration.
+
 - ☁️ **Cloud Media Storage**: Secure, scalable image hosting using **Cloudinary** for user avatars and destination imagery.
 
 ---
@@ -36,13 +43,8 @@
 
 | Dashboard & Analytics | AI Itinerary Generator |
 | :---: | :---: |
-| <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Dashboard+&+Travel+Stats+Screenshot" alt="Dashboard View"> | <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=AI+Itinerary+View" alt="Itinerary View"> |
+| <img src="screenshots/dashboard.png" alt="Dashboard View"> | <img src="screenshots/itinerary.png" alt="Itinerary View"> |
 
-| Real-Time Inline Editing | Export & Share Panel |
-| :---: | :---: |
-| <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Inline+Editing+UI" alt="Inline Editing UI"> | <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Share+via+WhatsApp/Email/PDF" alt="Share Panel"> |
-
-*(Note: Replace placeholder images with actual high-resolution screenshots)*
 </div>
 
 ---
