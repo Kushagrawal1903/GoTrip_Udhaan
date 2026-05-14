@@ -193,10 +193,15 @@ export default function Sidebar({ collapsed, onToggle, badges = {} }) {
                 >
                     <div style={{
                         width: 34, height: 34, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #0d9488, #14b8a6)',
+                        background: user?.avatarUrl ? 'transparent' : 'linear-gradient(135deg, #0d9488, #14b8a6)',
                         color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: '0.78rem', fontWeight: 700, flexShrink: 0,
-                    }}>{initials}</div>
+                        overflow: 'hidden', border: user?.avatarUrl ? '1px solid var(--border-color)' : 'none',
+                    }}>
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : initials}
+                    </div>
                     {!collapsed && (
                         <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{
@@ -224,8 +229,8 @@ export default function Sidebar({ collapsed, onToggle, badges = {} }) {
                         }}
                     >
                         {[
-                            { label: 'Profile', icon: '👤', action: () => navigate('/dashboard') },
-                            { label: 'Settings', icon: '⚙️', action: () => navigate('/dashboard') },
+                            { label: 'Profile', icon: '👤', action: () => navigate('/dashboard/profile') },
+                            { label: 'Settings', icon: '⚙️', action: () => navigate('/dashboard/settings') },
                         ].map(item => (
                             <button
                                 key={item.label}

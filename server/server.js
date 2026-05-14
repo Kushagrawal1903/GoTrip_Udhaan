@@ -21,6 +21,7 @@ const notificationRoutes = require('./routes/notifications');
 const exploreRoutes = require('./routes/explore');
 const emailRoutes = require('./routes/email');
 const shareRoutes = require('./routes/shareRoutes');
+const userRoutes = require('./routes/user');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -105,6 +106,9 @@ app.use('/api/email', emailRoutes);
 
 // Public share routes
 app.use('/api/share', shareRoutes);
+
+// User profile & settings routes
+app.use('/api/user', userRoutes);
 
 // ─── ERROR HANDLING ─────────────────────────────────────────
 

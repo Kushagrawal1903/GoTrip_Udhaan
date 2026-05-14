@@ -20,6 +20,8 @@ const PackingLists = lazy(() => import('./pages/dashboard/PackingLists'));
 const Collaborations = lazy(() => import('./pages/dashboard/Collaborations'));
 const Exports = lazy(() => import('./pages/dashboard/Exports'));
 const Explore = lazy(() => import('./pages/dashboard/Explore'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Settings = lazy(() => import('./pages/Settings'));
 
 /**
  * ProtectedRoute — redirects to login if not authenticated
@@ -88,6 +90,8 @@ export default function App() {
         <Route path="collaborations" element={<Collaborations />} />
         <Route path="exports" element={<Exports />} />
         <Route path="explore" element={<Explore />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
 
       {/* ─── Public/standalone routes (with Navbar + Footer) ─── */}

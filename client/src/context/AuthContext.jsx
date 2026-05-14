@@ -82,11 +82,24 @@ export function AuthProvider({ children }) {
         return res.data;
     }, []);
 
+    /**
+     * Refresh user data from server
+     */
+    const refreshUser = useCallback(async () => {
+        if (!token) return;
+        try {
+            const res = await api.get('/auth/me');
+            setUser(res.data.data.user);
+        } catch (err) {
+            console.error('Failed to refresh user:', err);
+        }
+    }, [token]);
+
     const isAuthenticated = !!user && !!token;
 
     return (
         <AuthContext.Provider
-            value={{ user, token, loading, isAuthenticated, login, loginWithGoogle, register, logout }}
+            value={{ user, token, loading, isAuthenticated, login, loginWithGoogle, register, logout, refreshUser }}
         >
             {children}
         </AuthContext.Provider>

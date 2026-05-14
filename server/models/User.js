@@ -32,6 +32,59 @@ const userSchema = new mongoose.Schema(
             unique: true,
             sparse: true,
         },
+
+        // ─── Profile fields ─────────────────────────────────
+        firstName: { type: String, trim: true, maxlength: 50 },
+        lastName: { type: String, trim: true, maxlength: 50 },
+        phone: { type: String, trim: true },
+        bio: { type: String, maxlength: 300 },
+        location: { type: String, trim: true, maxlength: 100 },
+        avatarUrl: { type: String, default: null },
+        avatarInitials: { type: String, default: null },
+
+        // ─── Preferences ────────────────────────────────────
+        preferences: {
+            defaultStyle: {
+                type: String,
+                enum: ['adventure', 'relaxation', 'cultural', 'family', 'romantic'],
+                default: 'adventure',
+            },
+            defaultBudget: {
+                type: String,
+                enum: ['low', 'mid', 'high'],
+                default: 'mid',
+            },
+            currency: { type: String, default: 'INR' },
+        },
+
+        // ─── Notification preferences ───────────────────────
+        notifications: {
+            email: {
+                tripReminders: { type: Boolean, default: true },
+                collaborationActivity: { type: Boolean, default: true },
+                inviteAccepted: { type: Boolean, default: true },
+                productUpdates: { type: Boolean, default: false },
+            },
+            whatsapp: {
+                dailyDigest: { type: Boolean, default: true },
+                preTripReminder: { type: Boolean, default: true },
+                weatherAlerts: { type: Boolean, default: false },
+            },
+            digestTime: { type: String, default: '07:30' },
+            timezone: { type: String, default: 'Asia/Kolkata' },
+        },
+
+        // ─── Privacy ────────────────────────────────────────
+        privacy: {
+            publicProfile: { type: Boolean, default: true },
+            showOnExploreFeed: { type: Boolean, default: false },
+            activityAnalytics: { type: Boolean, default: true },
+        },
+
+        // ─── Account ────────────────────────────────────────
+        plan: { type: String, enum: ['free', 'pro'], default: 'free' },
+        planExpiresAt: { type: Date, default: null },
+        whatsappOptIn: { type: Boolean, default: false },
     },
     {
         timestamps: true,

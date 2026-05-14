@@ -755,4 +755,64 @@ a {
   .mobile-stat-item:nth-child(even) {
     border-right: none !important;
   }
+
+  /* ─── Profile page responsive ──────────────────── */
+  .profile-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-left {
+    position: static !important;
+  }
+
+  .profile-name-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ─── Settings page responsive ─────────────────── */
+  .settings-tabs {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .settings-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .settings-timing-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+@media (max-width: 767px) {
+  .dashboard-container {
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+  }
+
+  .topbar-title {
+    font-size: 1rem !important;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .topbar-actions {
+    gap: 6px !important;
+  }
+
+  .topbar-actions button {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.9rem !important;
+  }
+}

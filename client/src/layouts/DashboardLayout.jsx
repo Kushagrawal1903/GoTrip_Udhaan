@@ -28,7 +28,7 @@ export default function DashboardLayout() {
     }, [location.pathname]);
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div className="dashboard-container">
             {/* Desktop sidebar */}
             <div className="sidebar-desktop">
                 <Sidebar
@@ -78,9 +78,10 @@ export default function DashboardLayout() {
                 </div>
             </div>
 
-            {/* Mobile bottom nav */}
             <div className="mobile-bottom-nav" style={{
-                position: 'fixed', bottom: 12, left: 12, right: 12, height: 64,
+                position: 'fixed', 
+                bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))', 
+                left: 12, right: 12, height: 64,
                 background: 'var(--bg-glass-nav)', 
                 backdropFilter: 'blur(12px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(180%)',

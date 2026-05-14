@@ -12,6 +12,8 @@ const PAGE_TITLES = {
     '/dashboard/collaborations': 'Collaborations',
     '/dashboard/exports': 'Exports',
     '/dashboard/explore': 'Explore',
+    '/dashboard/profile': 'My Profile',
+    '/dashboard/settings': 'Settings',
 };
 
 export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle }) {
@@ -95,7 +97,7 @@ export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle
             >☰</button>
 
             {/* Page title */}
-            <h1 style={{
+            <h1 className="topbar-title" style={{
                 fontWeight: 700, fontSize: '1.15rem', color: 'var(--text-primary)',
                 letterSpacing: '-0.01em', whiteSpace: 'nowrap',
             }}>{title}</h1>
@@ -128,7 +130,7 @@ export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle
                 />
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+            <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
                 {/* Mobile Search Toggle */}
                 <button
                     className="mobile-search-toggle"
@@ -145,6 +147,38 @@ export default function TopBar({ searchQuery, onSearchChange, onMobileMenuToggle
 
                 {/* Theme Toggle */}
                 <ThemeToggle />
+
+                {/* Profile Toggle */}
+                <button
+                    onClick={() => navigate('/dashboard/profile')}
+                    aria-label="Profile"
+                    title="Profile"
+                    style={{
+                        width: 36, height: 36, borderRadius: 8,
+                        border: '1px solid var(--border-color)', background: 'var(--bg-glass)',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.1rem', color: 'var(--text-primary)',
+                        transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-primary)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-glass)'}
+                >👤</button>
+
+                {/* Settings Toggle */}
+                <button
+                    onClick={() => navigate('/dashboard/settings')}
+                    aria-label="Settings"
+                    title="Settings"
+                    style={{
+                        width: 36, height: 36, borderRadius: 8,
+                        border: '1px solid var(--border-color)', background: 'var(--bg-glass)',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.1rem', color: 'var(--text-primary)',
+                        transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-primary)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-glass)'}
+                >⚙️</button>
 
                 {/* Notifications */}
                 <NotificationDropdown userId={user?.id} />
