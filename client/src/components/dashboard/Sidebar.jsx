@@ -21,6 +21,13 @@ const NAV_GROUPS = [
             { to: '/dashboard/stats', icon: '📈', label: 'Travel Stats' },
         ],
     },
+    {
+        label: 'Account',
+        items: [
+            { to: '/dashboard/profile', icon: '👤', label: 'My Profile' },
+            { to: '/dashboard/settings', icon: '⚙️', label: 'Settings' },
+        ],
+    },
 ];
 
 export default function Sidebar({ collapsed, onToggle, badges = {} }) {

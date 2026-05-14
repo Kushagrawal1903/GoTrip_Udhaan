@@ -2,9 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import {
-    PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip,
-    ResponsiveContainer, Legend,
-} from 'recharts';
+    Chart as ChartJS, ArcElement, Tooltip, Legend,
+    CategoryScale, LinearScale, BarElement
+} from 'chart.js';
+import { Pie, Bar } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 const STYLE_COLORS = {
     adventure: '#059669', relaxation: '#0d9488', cultural: '#d97706',
@@ -54,6 +57,43 @@ export default function TravelStats() {
 
     const maxDest = data.topDestinations?.[0]?.count || 1;
 
+    // --- Chart.js Data Preparation ---
+    const pieData = {
+        labels: data.tripsByStyle.map(d => d.style.charAt(0).toUpperCase() + d.style.slice(1)),
+        datasets: [{
+            data: data.tripsByStyle.map(d => d.count),
+            backgroundColor: data.tripsByStyle.map((d, i) => STYLE_COLORS[d.style] || PIE_COLORS[i % PIE_COLORS.length]),
+            borderWidth: 0,
+            hoverOffset: 4
+        }]
+    };
+
+    const monthlyData = {
+        labels: data.monthlyActivity.map(d => d.month),
+        datasets: [{
+            label: 'Trips',
+            data: data.monthlyActivity.map(d => d.trips),
+            backgroundColor: '#0d9488',
+            borderRadius: 4,
+        }]
+    };
+
+    const budgetData = {
+        labels: data.tripsByBudget.map(d => d.budget.charAt(0).toUpperCase() + d.budget.slice(1)),
+        datasets: [{
+            label: 'Trips',
+            data: data.tripsByBudget.map(d => d.count),
+            backgroundColor: data.tripsByBudget.map(d => BUDGET_COLORS[d.budget] || '#6b7280'),
+            borderRadius: 4,
+        }]
+    };
+
+    const chartOptions = {
+        plugins: {
+            legend: { labels: { color: '#888' } }
+        }
+    };
+
     return (
         <div style={{ maxWidth: 1000, margin: '0 auto' }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: 24 }}>
@@ -65,45 +105,34 @@ export default function TravelStats() {
                 {/* Trips by style — Donut */}
                 <div style={{ padding: '20px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                     <h4 style={{ fontWeight: 700, fontSize: '0.92rem', marginBottom: 16 }}>Trips by Style</h4>
-                    <ResponsiveContainer width="100%" height={220}>
-                        <PieChart>
-                            <Pie
-                                data={data.tripsByStyle}
-                                dataKey="count"
-                                nameKey="style"
-                                cx="50%" cy="50%"
-                                innerRadius={50} outerRadius={80}
-                                paddingAngle={3}
-                            >
-                                {data.tripsByStyle.map((entry, i) => (
-                                    <Cell key={entry.style} fill={STYLE_COLORS[entry.style] || PIE_COLORS[i % PIE_COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 8, fontSize: '0.8rem' }}
-                                formatter={(value, name) => [value, name.charAt(0).toUpperCase() + name.slice(1)]}
-                            />
-                            <Legend
-                                iconSize={10}
-                                formatter={(value) => <span style={{ fontSize: '0.75rem', textTransform: 'capitalize', color: 'var(--text-secondary)' }}>{value}</span>}
-                            />
-                        </PieChart>
-                    </ResponsiveContainer>
+                    <div style={{ position: 'relative', width: '100%', height: 220 }}>
+                        <Pie 
+                            data={pieData} 
+                            options={{
+                                responsive: true, maintainAspectRatio: false,
+                                cutout: '60%',
+                                plugins: { legend: { position: 'right', labels: { color: '#888', font: { size: 11 } } } }
+                            }} 
+                        />
+                    </div>
                 </div>
 
                 {/* Monthly activity — Bar */}
                 <div style={{ padding: '20px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                     <h4 style={{ fontWeight: 700, fontSize: '0.92rem', marginBottom: 16 }}>Monthly Activity</h4>
-                    <ResponsiveContainer width="100%" height={220}>
-                        <BarChart data={data.monthlyActivity} barCategoryGap="20%">
-                            <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                            <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={24} />
-                            <Tooltip
-                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 8, fontSize: '0.8rem' }}
-                            />
-                            <Bar dataKey="trips" fill="#0d9488" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <div style={{ position: 'relative', width: '100%', height: 220 }}>
+                        <Bar 
+                            data={monthlyData} 
+                            options={{
+                                responsive: true, maintainAspectRatio: false,
+                                scales: {
+                                    x: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } },
+                                    y: { grid: { display: false }, ticks: { stepSize: 1, color: '#888', font: { size: 10 } } }
+                                },
+                                plugins: { legend: { display: false } }
+                            }} 
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -112,23 +141,20 @@ export default function TravelStats() {
                 {/* Budget breakdown */}
                 <div style={{ padding: '20px', borderRadius: 12, background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
                     <h4 style={{ fontWeight: 700, fontSize: '0.92rem', marginBottom: 16 }}>Budget Breakdown</h4>
-                    <ResponsiveContainer width="100%" height={180}>
-                        <BarChart data={data.tripsByBudget} layout="vertical" barCategoryGap="30%">
-                            <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                            <YAxis
-                                type="category" dataKey="budget"
-                                tick={{ fontSize: 12, fill: 'var(--text-secondary)', textTransform: 'capitalize' }}
-                                axisLine={false} tickLine={false} width={72}
-                                tickFormatter={v => v.charAt(0).toUpperCase() + v.slice(1)}
-                            />
-                            <Tooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 8, fontSize: '0.8rem' }} />
-                            <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                                {data.tripsByBudget.map(entry => (
-                                    <Cell key={entry.budget} fill={BUDGET_COLORS[entry.budget] || '#6b7280'} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
+                    <div style={{ position: 'relative', width: '100%', height: 180 }}>
+                        <Bar 
+                            data={budgetData} 
+                            options={{
+                                indexAxis: 'y',
+                                responsive: true, maintainAspectRatio: false,
+                                scales: {
+                                    x: { grid: { display: false }, ticks: { stepSize: 1, color: '#888', font: { size: 10 } } },
+                                    y: { grid: { display: false }, ticks: { color: '#888', font: { size: 11 } } }
+                                },
+                                plugins: { legend: { display: false } }
+                            }} 
+                        />
+                    </div>
                 </div>
 
                 {/* Top destinations */}
