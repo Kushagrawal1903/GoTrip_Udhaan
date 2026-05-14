@@ -1,161 +1,203 @@
-# 🚀 GoTrip Pro — AI Smart Travel Planner
+<div align="center">
+  <img src="https://via.placeholder.com/150x150/0d9488/ffffff?text=GoTrip+Logo" alt="GoTrip Logo" width="120" height="120">
 
-An AI-powered travel itinerary planner built with **React + Vite** (frontend) and **Express + MongoDB** (backend), using **Google Gemini AI** for itinerary generation.
+  # 🌍 GoTrip Pro
+  **AI-Powered Travel Itinerary Planner & Real-Time Collaboration Platform**
+
+  [![MERN Stack](https://img.shields.io/badge/Stack-MERN-38B2AC?style=for-the-badge&logo=mongodb)](https://mongodb.com/)
+  [![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs)](https://nodejs.org/)
+  [![Socket.io](https://img.shields.io/badge/Socket.io-Real--Time-010101?style=for-the-badge&logo=socketdotio)](https://socket.io/)
+  [![Google Gemini AI](https://img.shields.io/badge/AI-Google_Gemini-4285F4?style=for-the-badge&logo=google)](https://deepmind.google/technologies/gemini/)
+
+  <p align="center">
+    Plan, collaborate, edit, and share your dream vacations with the power of Artificial Intelligence.
+  </p>
+</div>
+
+<hr />
+
+## ✨ Features
+
+- 🤖 **AI-Curated Itineraries**: Generate complete, personalized day-by-day itineraries tailored to your travel style, budget, and group size using the **Google Gemini AI API**.
+- ✏️ **Inline Itinerary Editing**: Fully editable, hover-triggered React UI to manually tweak AI-generated slots without page reloads.
+- 👥 **Real-Time Collaboration**: Invite friends to view, edit, and contribute to the itinerary. Changes sync instantly via **Socket.io**.
+- 📊 **Dynamic Dashboard & Analytics**: Track your travel stats, regions visited, collaborator counts, and upcoming trips with animated, responsive UI components.
+- 📱 **WhatsApp & Email Sharing**: Instantly share trips via **WhatsApp Click-to-Chat** or beautifully styled **Resend** HTML emails. No account required for recipients!
+- 📄 **PDF Export**: Generate professional, formatted PDF versions of your itineraries for offline use.
+- 🔒 **Secure Authentication**: Traditional Email/Password (bcrypt + JWT) and seamless **Google OAuth** integration.
+- ☁️ **Cloud Media Storage**: Secure, scalable image hosting using **Cloudinary** for user avatars and destination imagery.
 
 ---
 
-## 🏗️ Project Structure
+## 📸 UI Screenshots
 
-```
-GoTrip/
-├── api/
-│   └── index.js          ← Vercel serverless entry point
-├── client/               ← React + Vite frontend
-│   ├── src/
-│   └── vite.config.js
-├── server/               ← Express backend
-│   ├── config/db.js      ← MongoDB connection (cached for serverless)
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── server.js         ← Express app (exports for Vercel)
-├── vercel.json           ← Vercel routing & build config
-└── package.json
-```
+<div align="center">
+
+| Dashboard & Analytics | AI Itinerary Generator |
+| :---: | :---: |
+| <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Dashboard+&+Travel+Stats+Screenshot" alt="Dashboard View"> | <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=AI+Itinerary+View" alt="Itinerary View"> |
+
+| Real-Time Inline Editing | Export & Share Panel |
+| :---: | :---: |
+| <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Inline+Editing+UI" alt="Inline Editing UI"> | <img src="https://via.placeholder.com/600x350/1e293b/ffffff?text=Share+via+WhatsApp/Email/PDF" alt="Share Panel"> |
+
+*(Note: Replace placeholder images with actual high-resolution screenshots)*
+</div>
 
 ---
 
-## 💻 Local Development
+## 🛠️ Tech Stack
+
+### Frontend (Client)
+- **Framework**: React (Vite)
+- **State Management**: React Query (TanStack), React Context API
+- **Routing**: React Router DOM
+- **Styling**: Modern Vanilla CSS + Flexbox/Grid (Glassmorphism, Dark/Light modes)
+- **Icons**: React Icons / Custom SVGs
+
+### Backend (Server)
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB & Mongoose ORM
+- **WebSockets**: Socket.io (for live collaboration)
+- **Authentication**: JSON Web Tokens (JWT), Passport.js, Google OAuth 2.0
+
+### External APIs & Integrations
+- **AI Engine**: Google Gemini API
+- **Email Delivery**: Resend API
+- **Image Storage**: Cloudinary API
+- **Social Sharing**: Meta WhatsApp Click-to-Chat API
+
+---
+
+## 🚀 Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine.
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB Atlas account (or local MongoDB)
-- Gemini API key
-- Google Maps API key
+- Node.js (v18 or higher)
+- MongoDB (Local instance or MongoDB Atlas cluster)
+- Google Cloud Console Project (for OAuth and Gemini AI keys)
+- Resend Account (for email services)
+- Cloudinary Account (for image hosting)
 
-### Setup
-
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/GoTrip.git
-   cd GoTrip
-   ```
-
-2. **Install dependencies**
-   ```bash
-   # Server
-   cd server && npm install
-
-   # Client
-   cd ../client && npm install
-   ```
-
-3. **Configure environment** — Create `server/.env`:
-   ```env
-   PORT=5000
-   MONGODB_URI=mongodb+srv://YOUR_CONNECTION_STRING
-   JWT_SECRET=your_super_secret_key_here
-   GEMINI_API_KEY=your_gemini_api_key
-   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-   ```
-
-4. **Run locally**
-   ```bash
-   # Terminal 1 — Start backend
-   cd server && npm run dev
-
-   # Terminal 2 — Start frontend
-   cd client && npm run dev
-   ```
-
-   Frontend: `http://localhost:5173` | Backend: `http://localhost:5000`
-
----
-
-## ☁️ Deploy to Vercel
-
-### Step 1 — Push to GitHub
-
-Make sure your code is committed and pushed:
-
+### 1. Clone the repository
 ```bash
-git add .
-git commit -m "Prepare for Vercel deployment"
-git push origin main
+git clone https://github.com/yourusername/GoTrip_Udhaan.git
+cd GoTrip_Udhaan
 ```
 
-> ⚠️ **IMPORTANT**: The `.gitignore` file excludes `.env` files. Your secrets will NOT be pushed to GitHub. This is expected — you'll add them in Vercel's Dashboard.
+### 2. Install Dependencies
+Install dependencies for both the server and the client.
+```bash
+# Install Server Dependencies
+cd server
+npm install
 
-### Step 2 — Import to Vercel
+# Install Client Dependencies
+cd ../client
+npm install
+```
 
-1. Go to [vercel.com](https://vercel.com) and sign in (GitHub login recommended)
-2. Click **"Add New Project"**
-3. **Import** your GoTrip GitHub repository
-4. Vercel will auto-detect settings from `vercel.json` — **no changes needed**
-5. Click **Deploy** (it will fail the first time — that's OK, we need to add env vars)
+### 3. Environment Variables
+Create a `.env` file in the **server** directory:
+```env
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_key
+GEMINI_API_KEY=your_google_gemini_api_key
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+CLIENT_URL=http://localhost:5173
+FRONTEND_URL=http://localhost:5173
 
-### Step 3 — Add Environment Variables
+# Resend Service
+RESEND_API_KEY=your_resend_api_key
+EMAIL_FROM=GoTrip <hello@yourdomain.com>
 
-Go to your project in Vercel → **Settings** → **Environment Variables** and add:
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+CLOUDINARY_API_KEY=your_cloudinary_key
+CLOUDINARY_API_SECRET=your_cloudinary_secret
+```
 
-| Variable | Value |
-|---|---|
-| `MONGODB_URI` | `mongodb+srv://your_connection_string` |
-| `JWT_SECRET` | A strong random string (e.g. `openssl rand -base64 32`) |
-| `GEMINI_API_KEY` | Your Google Gemini API key |
-| `GOOGLE_MAPS_API_KEY` | Your Google Maps API key |
+Create a `.env` file in the **client** directory:
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id
+```
 
-> 💡 **Tip**: Use a different `JWT_SECRET` for production than development.
+### 4. Run the Application
+You can run the frontend and backend concurrently. 
 
-### Step 4 — Redeploy
+**Start the Backend Server:**
+```bash
+cd server
+npm run dev
+```
 
-After adding env vars, go to **Deployments** → click the 3-dot menu on the latest → **Redeploy**.
+**Start the Frontend Client:**
+```bash
+cd client
+npm run dev
+```
 
-### Step 5 — Configure MongoDB Atlas Network Access
-
-Your MongoDB Atlas cluster must allow connections from Vercel's servers:
-
-1. Go to [MongoDB Atlas](https://cloud.mongodb.com) → your cluster → **Network Access**
-2. Click **Add IP Address** → **Allow Access from Anywhere** (`0.0.0.0/0`)
-3. Click **Confirm**
-
-> This is required because Vercel serverless functions run on dynamic IPs.
-
-### Step 6 — Test
-
-Visit your deployment URL and test:
-- ✅ Homepage loads
-- ✅ Register a new account
-- ✅ Login works
-- ✅ Generate a trip itinerary
-- ✅ Save a trip to dashboard
-- ✅ View saved trips
-
----
-
-## 🔧 What Was Changed for Vercel
-
-| File | Change |
-|---|---|
-| `api/index.js` | **NEW** — Vercel serverless function entry point |
-| `server/server.js` | Exports Express app, `app.listen()` only runs locally |
-| `server/config/db.js` | Mongoose connection caching for serverless cold starts |
-| `client/src/services/api.js` | API base URL configurable via `VITE_API_URL` env var |
-| `vercel.json` | **NEW** — Build, routing, and SPA fallback config |
-| `.gitignore` | **NEW** — Excludes `.env`, `node_modules`, build artifacts |
-| `package.json` | Updated with proper scripts and metadata |
+The client will typically start on `http://localhost:5173` and the server on `http://localhost:5000`.
 
 ---
 
-## 📝 Tech Stack
+## 📂 Project Structure
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, Vite 7, Tailwind CSS 4, React Router 7 |
-| Backend | Express 4, Node.js |
-| Database | MongoDB Atlas + Mongoose |
-| AI | Google Gemini 2.5 Flash |
-| APIs | Google Maps, Google Places, Wikipedia (fallback) |
-| Auth | JWT + bcrypt |
-| Hosting | Vercel (Serverless Functions + Static) |
+```text
+GoTrip_Udhaan/
+├── client/                     # React Frontend
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   ├── context/            # Global state context (Auth, etc.)
+│   │   ├── hooks/              # Custom React hooks (React Query)
+│   │   ├── pages/              # Route-level components
+│   │   ├── services/           # Axios API configuration
+│   │   └── index.css           # Global design system & tokens
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/                     # Node.js + Express Backend
+│   ├── controllers/            # Route logic and handlers
+│   ├── middleware/             # Auth, file upload (Multer) middlewares
+│   ├── models/                 # Mongoose Database Schemas (User, Trip)
+│   ├── routes/                 # Express API routes
+│   ├── services/               # Resend, Cloudinary, Gemini, Sockets
+│   ├── server.js               # Entry point
+│   └── package.json
+└── README.md
+```
+
+---
+
+## 🔒 Security Practices
+- Passwords are cryptographically hashed using **bcryptjs**.
+- Protected API routes using **JWT Authorization Bearer Tokens**.
+- Environment variables securely handle all secrets and keys.
+- **CORS** configurations strictly mapped to the frontend domain.
+- Input validation and rate-limiting to prevent spam requests.
+
+---
+
+## 🤝 Contributing
+Contributions, issues, and feature requests are welcome! 
+Feel free to check the [issues page](https://github.com/yourusername/GoTrip_Udhaan/issues).
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<div align="center">
+  <p>Made with ❤️ by <a href="https://github.com/Kushagrawal1903">Kush Agrawal</a></p>
+</div>

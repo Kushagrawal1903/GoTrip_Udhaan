@@ -22,7 +22,7 @@ router.get('/stats', auth, async (req, res, next) => {
                     { 'collaborators.userId': userId, 'collaborators.status': 'accepted' },
                 ],
             },
-            'destination duration collaborators createdAt'
+            'destination duration collaborators createdAt userId'
         ).lean();
 
         const ownedTrips = trips.filter(t => t.userId?.toString() === userId.toString());
