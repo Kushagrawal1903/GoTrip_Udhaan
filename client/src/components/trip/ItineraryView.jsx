@@ -6,7 +6,7 @@ import BudgetChart from './BudgetChart';
 /**
  * ItineraryView — Full-width trip result display
  */
-export default function ItineraryView({ tripData, placeDetails, onSave, saving }) {
+export default function ItineraryView({ tripData, placeDetails, onSave, saving, canEdit, editingDay, editValues, isSaving, saveError, onStartEdit, onDiscard, onSaveEdit, onEditChange }) {
     const [heroImgFailed, setHeroImgFailed] = useState(false);
 
     if (!tripData) return null;
@@ -226,7 +226,21 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving }
                         </h3>
                         <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             {tripData.itinerary.map((day, i) => (
-                                <DayCard key={i} day={day} destination={tripData.destination} />
+                                <DayCard
+                                    key={i}
+                                    day={day}
+                                    dayIndex={i}
+                                    destination={tripData.destination}
+                                    canEdit={canEdit}
+                                    isEditing={editingDay === i}
+                                    editValues={editingDay === i ? editValues : null}
+                                    isSaving={isSaving}
+                                    saveError={editingDay === i ? saveError : null}
+                                    onStartEdit={onStartEdit}
+                                    onDiscard={onDiscard}
+                                    onSaveEdit={onSaveEdit}
+                                    onEditChange={onEditChange}
+                                />
                             ))}
                         </div>
                     </div>

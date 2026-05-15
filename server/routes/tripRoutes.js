@@ -252,4 +252,100 @@ router.post('/:id/share', auth, async (req, res, next) => {
     }
 });
 
+/**
+ * PATCH /api/trips/:tripId/itinerary/slot
+ * Edit a single time-slot activity within a day of the itinerary
+ * Protected route — only the trip owner can edit
+ */
+router.patch('/:tripId/itinerary/slot', auth, async (req, res, next) => {
+    try {
+        const { dayIndex, slot, title, description } = req.body;
+
+        // ── Validate slot name ──────────────────────────────
+        const validSlots = ['morning', 'afternoon', 'evening', 'night'];
+        if (!validSlots.includes(slot)) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid slot. Must be one of: ${validSlots.join(', ')}`,
+            });
+        }
+
+        // ── Validate title & description ────────────────────
+        if (!title || typeof title !== 'string' || title.trim().length === 0 || title.trim().length > 100) {
+            return res.status(400).json({
+                success: false,
+                message: 'Title is required and must be 1–100 characters.',
+            });
+        }
+        if (!description || typeof description !== 'string' || description.trim().length === 0 || description.trim().length > 400) {
+            return res.status(400).json({
+                success: false,
+                message: 'Description is required and must be 1–400 characters.',
+            });
+        }
+
+        // ── Find trip — owner only ──────────────────────────
+        const trip = await Trip.findOne({
+            _id: req.params.tripId,
+            userId: req.userId,
+        });
+
+        if (!trip) {
+            return res.status(404).json({
+                success: false,
+                message: 'Trip not found or unauthorized.',
+            });
+        }
+
+        // ── Validate dayIndex ───────────────────────────────
+        const itinerary = trip.tripData?.itinerary;
+        if (!itinerary || !Array.isArray(itinerary)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Trip has no itinerary data.',
+            });
+        }
+
+        const dayIdx = parseInt(dayIndex);
+        if (isNaN(dayIdx) || dayIdx < 0 || dayIdx >= itinerary.length) {
+            return res.status(400).json({
+                success: false,
+                message: `dayIndex must be between 0 and ${itinerary.length - 1}.`,
+            });
+        }
+
+        // ── Find the matching activity by time slot ─────────
+        const day = itinerary[dayIdx];
+        if (!day.activities || !Array.isArray(day.activities)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Day has no activities array.',
+            });
+        }
+
+        const activityIndex = day.activities.findIndex(
+            (a) => (a.time || '').toLowerCase() === slot
+        );
+
+        if (activityIndex === -1) {
+            return res.status(400).json({
+                success: false,
+                message: `No "${slot}" activity found in day ${dayIdx + 1}.`,
+            });
+        }
+
+        // ── Update the activity fields ──────────────────────
+        day.activities[activityIndex].placeName = title.trim();
+        day.activities[activityIndex].activity = description.trim();
+
+        // Required for Mongoose to detect changes in Mixed type fields
+        trip.markModified('tripData');
+        await trip.save();
+
+        return res.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

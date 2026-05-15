@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -26,6 +26,12 @@ export default function TripResult() {
     const [error, setError] = useState('');
     const [exporting, setExporting] = useState(false);
     const [collabOpen, setCollabOpen] = useState(false);
+
+    // ─── Itinerary Editing State ─────────────────────────────
+    const [editingDay, setEditingDay] = useState(null);
+    const [editValues, setEditValues] = useState({});
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveError, setSaveError] = useState(null);
 
     // Determine ownership
     const isOwner = trip && user && trip.userId === user.id;
@@ -110,6 +116,88 @@ export default function TripResult() {
 
     // Email delivery hook
     const tripEmail = useTripEmail(id);
+
+    // ─── Itinerary Edit Handlers ─────────────────────────────
+    const handleStartEdit = useCallback((dayIndex) => {
+        if (editingDay !== null && editingDay !== dayIndex) {
+            const confirmed = window.confirm(
+                `You have unsaved changes on Day ${editingDay + 1}. Discard them?`
+            );
+            if (!confirmed) return;
+        }
+        const day = trip.tripData.itinerary[dayIndex];
+        const values = {};
+        (day.activities || []).forEach((act) => {
+            const slot = (act.time || '').toLowerCase();
+            if (['morning', 'afternoon', 'evening', 'night'].includes(slot)) {
+                values[slot] = { title: act.placeName || '', description: act.activity || '' };
+            }
+        });
+        setEditValues(values);
+        setEditingDay(dayIndex);
+        setSaveError(null);
+    }, [editingDay, trip]);
+
+    const handleDiscard = useCallback(() => {
+        setEditingDay(null);
+        setEditValues({});
+        setSaveError(null);
+    }, []);
+
+    const handleEditChange = useCallback((slot, field, value) => {
+        setEditValues((prev) => ({
+            ...prev,
+            [slot]: { ...prev[slot], [field]: value },
+        }));
+    }, []);
+
+    const updateTripDay = useCallback((dayIndex, newValues) => {
+        setTrip((prev) => {
+            const newTripData = { ...prev.tripData };
+            const newItinerary = [...newTripData.itinerary];
+            const day = { ...newItinerary[dayIndex] };
+            day.activities = day.activities.map((act) => {
+                const slot = (act.time || '').toLowerCase();
+                if (newValues[slot]) {
+                    return {
+                        ...act,
+                        placeName: newValues[slot].title,
+                        activity: newValues[slot].description,
+                    };
+                }
+                return act;
+            });
+            newItinerary[dayIndex] = day;
+            newTripData.itinerary = newItinerary;
+            return { ...prev, tripData: newTripData };
+        });
+    }, []);
+
+    const handleSave = useCallback(async () => {
+        setIsSaving(true);
+        setSaveError(null);
+        const slots = Object.keys(editValues);
+        try {
+            for (const slot of slots) {
+                const res = await api.patch(`/trips/${id}/itinerary/slot`, {
+                    dayIndex: editingDay,
+                    slot,
+                    title: editValues[slot].title,
+                    description: editValues[slot].description,
+                });
+                if (!res.data.success) {
+                    throw new Error(res.data.message || 'Save failed');
+                }
+            }
+            updateTripDay(editingDay, editValues);
+            setEditingDay(null);
+            setEditValues({});
+        } catch (err) {
+            setSaveError('Failed to save. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    }, [id, editingDay, editValues, updateTripDay]);
 
     // Socket.io for real-time collaboration
     useSocket(id, {
@@ -368,6 +456,15 @@ export default function TripResult() {
             <ItineraryView
                 tripData={trip.tripData}
                 placeDetails={placeDetails}
+                canEdit={isOwner}
+                editingDay={editingDay}
+                editValues={editValues}
+                isSaving={isSaving}
+                saveError={saveError}
+                onStartEdit={handleStartEdit}
+                onDiscard={handleDiscard}
+                onSaveEdit={handleSave}
+                onEditChange={handleEditChange}
             />
 
             {/* Packing List Section */}

@@ -815,4 +815,240 @@ a {
     height: 32px !important;
     font-size: 0.9rem !important;
   }
+}
+
+/* ─── ITINERARY EDIT MODE ────────────────────────────────────── */
+
+/* Edit day ghost button — sits in the day card header */
+.edit-day-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.edit-day-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.edit-day-btn:active {
+  transform: scale(0.97);
+}
+
+/* Blue edit banner */
+.edit-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: #fff;
+  min-height: 44px;
+  animation: fadeIn 0.25s ease;
+}
+
+.edit-banner-label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.edit-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Discard button */
+.btn-discard {
+  padding: 6px 16px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-discard:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.btn-discard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Save all button */
+.btn-save-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px;
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.btn-save-all:hover {
+  background: #f0fdfa;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-save-all:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Save spinner */
+.save-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(13, 148, 136, 0.25);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Edit error message */
+.edit-error {
+  padding: 8px 20px;
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--color-danger);
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(220, 38, 38, 0.12);
+}
+
+/* Slot edit row */
+.slot-edit-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.slot-edit-row:last-child {
+  margin-bottom: 0;
+}
+
+.slot-time-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  padding-top: 12px;
+  flex-shrink: 0;
+}
+
+.slot-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.slot-title-input {
+  font-weight: 600 !important;
+}
+
+.slot-desc-input {
+  font-size: 0.88rem !important;
+}
+
+/* ─── EDIT MODE — MOBILE RESPONSIVE ──────────────────────────── */
+@media (max-width: 768px) {
+  .edit-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .edit-banner-label {
+    justify-content: center;
+  }
+
+  .edit-banner-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-save-all {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
+    font-size: 0.88rem;
+    min-height: 44px;
+  }
+
+  .btn-discard {
+    width: 100%;
+    text-align: center;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.82rem;
+    padding: 8px;
+    order: 1;
+  }
+
+  .btn-save-all {
+    order: 0;
+  }
+
+  .slot-edit-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .slot-time-label {
+    padding-top: 0;
+    min-width: auto;
+  }
+
+  .slot-inputs .input-field {
+    min-height: 44px;
+    font-size: 16px !important; /* Prevents iOS zoom-on-focus */
+  }
+
+  .edit-day-btn {
+    padding: 6px 12px;
+    font-size: 0.74rem;
+  }
 }
