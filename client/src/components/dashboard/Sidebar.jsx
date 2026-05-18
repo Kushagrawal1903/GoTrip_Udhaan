@@ -127,16 +127,57 @@ export default function Sidebar({ collapsed, onToggle, badges = {} }) {
 
             {/* Navigation */}
             <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 8px' }}>
-                {NAV_GROUPS.map((group, gi) => (
-                    <div key={gi} style={{ marginBottom: 16 }}>
-                        {!collapsed && (
-                            <div style={{
-                                fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase',
-                                letterSpacing: '0.06em', color: 'var(--text-muted)',
-                                padding: '4px 12px 8px', userSelect: 'none',
-                            }}>{group.label}</div>
-                        )}
-                        {group.items.map(item => {
+                {(() => {
+                    const dynamicNavGroups = NAV_GROUPS.map(group => {
+                        if (group.label === 'Account') {
+                            return {
+                                ...group,
+                                items: [
+                                    ...group.items,
+                                    { icon: '🚪', label: 'Log out', action: logout, danger: true }
+                                ]
+                            };
+                        }
+                        return group;
+                    });
+                    
+                    return dynamicNavGroups.map((group, gi) => (
+                        <div key={gi} style={{ marginBottom: 16 }}>
+                            {!collapsed && (
+                                <div style={{
+                                    fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase',
+                                    letterSpacing: '0.06em', color: 'var(--text-muted)',
+                                    padding: '4px 12px 8px', userSelect: 'none',
+                                }}>{group.label}</div>
+                            )}
+                            {group.items.map(item => {
+                            if (item.action) {
+                                return (
+                                    <button
+                                        key={item.label}
+                                        onClick={item.action}
+                                        aria-label={item.label}
+                                        title={collapsed ? item.label : undefined}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: 10,
+                                            padding: collapsed ? '10px 0' : '9px 12px',
+                                            justifyContent: collapsed ? 'center' : 'flex-start',
+                                            borderRadius: 8, marginBottom: 2,
+                                            border: 'none', background: 'transparent', cursor: 'pointer',
+                                            width: '100%', textAlign: 'left',
+                                            fontSize: '0.88rem', fontWeight: 500,
+                                            color: item.danger ? 'var(--color-danger)' : 'var(--text-secondary)',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = item.danger ? 'rgba(220, 38, 38, 0.04)' : 'var(--bg-glass)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <span style={{ fontSize: '1rem', flexShrink: 0, width: 24, textAlign: 'center' }} aria-hidden="true">{item.icon}</span>
+                                        {!collapsed && <span>{item.label}</span>}
+                                    </button>
+                                );
+                            }
+
                             const active = isActive(item.to);
                             const badge = item.badgeKey && badges[item.badgeKey];
                             return (
@@ -175,7 +216,7 @@ export default function Sidebar({ collapsed, onToggle, badges = {} }) {
                             );
                         })}
                     </div>
-                ))}
+                ))})()}
             </nav>
 
             {/* User section */}

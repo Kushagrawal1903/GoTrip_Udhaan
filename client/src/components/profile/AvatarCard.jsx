@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
  * AvatarCard — User avatar, name, email, plan badge, and photo upload
  */
 export default function AvatarCard({ profile, onAvatarChange }) {
-    const { refreshUser } = useAuth();
+    const { refreshUser, logout } = useAuth();
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
@@ -161,6 +161,30 @@ export default function AvatarCard({ profile, onAvatarChange }) {
                 )}
             </div>
             {error && <div style={{ marginTop: 10, fontSize: '0.78rem', color: 'var(--color-danger)' }}>{error}</div>}
+
+            {/* Mobile Log Out - visible on mobile mostly but fine everywhere */}
+            <div style={{ marginTop: 24, paddingTop: 16, borderTop: '1px solid var(--border-color)' }}>
+                <button
+                    onClick={logout}
+                    className="btn-outline"
+                    style={{
+                        width: '100%',
+                        borderColor: 'var(--color-danger)',
+                        color: 'var(--color-danger)',
+                        gap: 8,
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.background = 'var(--color-danger)';
+                        e.currentTarget.style.color = '#fff';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--color-danger)';
+                    }}
+                >
+                    <span aria-hidden="true">🚪</span> Log Out
+                </button>
+            </div>
         </div>
     );
 }
