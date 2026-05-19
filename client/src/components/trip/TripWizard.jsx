@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import ThemeToggle from '../layout/ThemeToggle';
 import './TripWizard.css';
 
@@ -568,16 +569,22 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
 
       {/* ─── Navigation Header ─── */}
       <div className="wiz-nav">
-        <button
-          className="wiz-back-btn"
-          onClick={goBack}
-          style={{
-            opacity: (currentStep === 0 || loading) ? 0 : 1,
-            pointerEvents: (currentStep === 0 || loading) ? 'none' : 'auto',
-          }}
-        >
-          ← Back
-        </button>
+        <div className="wiz-nav-left">
+          <Link to="/dashboard" className="wiz-brand">
+            <img src="/GoTrip_Logo.jpeg" alt="GoTrip" className="wiz-logo-img" />
+            <span className="wiz-brand-name">GoTrip</span>
+          </Link>
+          <button
+            className="wiz-back-btn"
+            onClick={goBack}
+            style={{
+              opacity: (currentStep === 0 || loading) ? 0 : 1,
+              pointerEvents: (currentStep === 0 || loading) ? 'none' : 'auto',
+            }}
+          >
+            ← Back
+          </button>
+        </div>
 
         <div className="wiz-dots">
           {Array.from({ length: TOTAL_STEPS }).map((_, i) => (

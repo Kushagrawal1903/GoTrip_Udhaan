@@ -74,6 +74,39 @@
   gap: 16px;
 }
 
+.wiz-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wiz-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.wiz-brand:hover {
+  opacity: 0.85;
+}
+
+.wiz-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.wiz-brand-name {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--wiz-text);
+  letter-spacing: -0.02em;
+}
+
 .wiz-back-btn {
   display: flex;
   align-items: center;

@@ -348,4 +348,58 @@ router.patch('/:tripId/itinerary/slot', auth, async (req, res, next) => {
     }
 });
 
+/**
+ * POST /api/trips/:tripId/share-analytics
+ * Track share card events (download, whatsapp, link copy, native share)
+ * Protected route — requires authentication
+ */
+router.post('/:tripId/share-analytics', auth, async (req, res, next) => {
+    try {
+        const { platform } = req.body;
+
+        const validPlatforms = ['download', 'whatsapp', 'link', 'native'];
+        if (!validPlatforms.includes(platform)) {
+            return res.status(400).json({
+                success: false,
+                message: `Platform must be one of: ${validPlatforms.join(', ')}`,
+            });
+        }
+
+        await Trip.findByIdAndUpdate(req.params.tripId, {
+            $inc: {
+                'shares.total': 1,
+                [`shares.byPlatform.${platform}`]: 1,
+            },
+            $set: { 'shares.lastSharedAt': new Date() },
+        });
+
+        res.json({ success: true });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * GET /api/trips/:tripId/public
+ * Returns limited trip data for public card page — NO auth required.
+ */
+router.get('/:tripId/public', async (req, res, next) => {
+    try {
+        const trip = await Trip.findById(req.params.tripId)
+            .select('destination duration travelers travelStyle budget tripData destinationImage coordinates createdAt')
+            .lean();
+
+        if (!trip) {
+            return res.status(404).json({
+                success: false,
+                message: 'Trip not found.',
+            });
+        }
+
+        res.json({ success: true, data: { trip } });
+    } catch (error) {
+        next(error);
+    }
+});
+
 module.exports = router;

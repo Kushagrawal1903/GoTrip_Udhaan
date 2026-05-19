@@ -6,6 +6,7 @@ import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
 import CollaboratorPanel from '../components/CollaboratorPanel';
 import TripEmailModal from '../components/trip/TripEmailModal';
+import SharePanel from '../components/share/SharePanel';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import usePackingList from '../hooks/usePackingList';
@@ -26,6 +27,7 @@ export default function TripResult() {
     const [error, setError] = useState('');
     const [exporting, setExporting] = useState(false);
     const [collabOpen, setCollabOpen] = useState(false);
+    const [sharePanelOpen, setSharePanelOpen] = useState(false);
 
     // ─── Itinerary Editing State ─────────────────────────────
     const [editingDay, setEditingDay] = useState(null);
@@ -535,6 +537,47 @@ export default function TripResult() {
                         </button>
                     )}
 
+                    {/* Share Card button — owner only */}
+                    {isOwner && (
+                        <button
+                            onClick={() => setSharePanelOpen(true)}
+                            aria-label="Create shareable card"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 7,
+                                padding: '8px 20px',
+                                fontSize: '0.85rem',
+                                fontWeight: 600,
+                                color: '#fff',
+                                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+                                border: 'none',
+                                borderRadius: 10,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.25)',
+                                whiteSpace: 'nowrap',
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                e.currentTarget.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(99, 102, 241, 0.25)';
+                            }}
+                        >
+                            🎨 Share Card
+                            {trip.shares?.total > 0 && (
+                                <span style={{
+                                    fontSize: '0.7rem', opacity: 0.8, fontWeight: 500,
+                                }}>
+                                    · {trip.shares.total}×
+                                </span>
+                            )}
+                        </button>
+                    )}
+
                     <button
                         className="btn-outline"
                         onClick={() => navigate('/plan')}
@@ -602,6 +645,13 @@ export default function TripResult() {
                 success={tripEmail.success}
                 destination={trip.destination}
                 defaultEmail={user?.email || ''}
+            />
+
+            {/* Share Card Panel */}
+            <SharePanel
+                isOpen={sharePanelOpen}
+                onClose={() => setSharePanelOpen(false)}
+                trip={trip}
             />
         </div>
     );

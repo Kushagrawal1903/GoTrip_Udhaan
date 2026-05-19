@@ -99,6 +99,18 @@ const tripSchema = new mongoose.Schema(
         // ─── FEATURE 4: Public Trip Sharing ────────────
         shareId: { type: String, unique: true, sparse: true },
         isPublic: { type: Boolean, default: false },
+
+        // ─── FEATURE 5: Share Card Analytics ─────────────
+        shares: {
+            total: { type: Number, default: 0 },
+            byPlatform: {
+                download: { type: Number, default: 0 },
+                whatsapp: { type: Number, default: 0 },
+                link: { type: Number, default: 0 },
+                native: { type: Number, default: 0 },
+            },
+            lastSharedAt: Date,
+        },
     },
     {
         timestamps: true,
