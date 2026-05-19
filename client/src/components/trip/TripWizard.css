@@ -1,0 +1,840 @@
+/* Light mode by default */
+.trip-wizard {
+  --wiz-bg: #F8FAFC;
+  --wiz-surface: #FFFFFF;
+  --wiz-surface2: #E2E8F0;
+  --wiz-border: #CBD5E1;
+  --wiz-teal: #0D9488;
+  --wiz-teal-dim: rgba(13, 148, 136, 0.08);
+  --wiz-teal-glow: rgba(13, 148, 136, 0.2);
+  --wiz-blue: #0284C7;
+  --wiz-text: #0F172A;
+  --wiz-muted: #475569;
+
+  position: fixed;
+  inset: 0;
+  background: var(--wiz-bg);
+  color: var(--wiz-text);
+  display: flex;
+  flex-direction: column;
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  z-index: 200;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Dark mode override */
+:root.dark .trip-wizard {
+  --wiz-bg: #0D1117;
+  --wiz-surface: #161B22;
+  --wiz-surface2: #1C2330;
+  --wiz-border: #2D3748;
+  --wiz-teal: #14B8A6;
+  --wiz-teal-dim: rgba(20, 184, 166, 0.12);
+  --wiz-teal-glow: rgba(20, 184, 166, 0.3);
+  --wiz-blue: #38BDF8;
+  --wiz-text: #F0F6FC;
+  --wiz-muted: #8B949E;
+}
+
+/* ─── Progress Bar ─────────────────────────────────────────── */
+.wiz-progress-bar {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.wiz-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--wiz-teal), var(--wiz-blue));
+  border-radius: 0 1px 1px 0;
+}
+
+/* ─── Navigation Header ───────────────────────────────────── */
+.wiz-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  height: 64px;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+:root.dark .wiz-nav {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.wiz-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wiz-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--wiz-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--wiz-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.wiz-back-btn:hover {
+  border-color: var(--wiz-teal);
+  color: var(--wiz-text);
+}
+
+/* ─── Step Dots ────────────────────────────────────────────── */
+.wiz-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wiz-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--wiz-border);
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.wiz-dot.completed {
+  border-color: var(--wiz-teal);
+  background: var(--wiz-teal);
+}
+
+.wiz-dot.current {
+  width: 24px;
+  height: 6px;
+  border-radius: 3px;
+  border-color: var(--wiz-teal);
+  background: var(--wiz-teal);
+}
+
+.wiz-step-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--wiz-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wiz-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.wiz-step-container {
+  width: 100%;
+  max-width: 680px;
+  padding: 20px 24px 40px;
+}
+
+/* ─── Ambient Glows ────────────────────────────────────────── */
+.wiz-glow-1 {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(20, 184, 166, 0.06);
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wiz-glow-2 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Typography ───────────────────────────────────────────── */
+.wiz-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--wiz-teal);
+  margin-bottom: 8px;
+}
+
+.wiz-headline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 800;
+  line-height: 1.15;
+  background: linear-gradient(135deg, #0F172A 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+:root.dark .wiz-headline {
+  background: linear-gradient(135deg, #F0F6FC 0%, #8B949E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wiz-subtext {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--wiz-muted);
+  line-height: 1.5;
+  margin-bottom: 32px;
+}
+
+/* ─── Search Input ─────────────────────────────────────────── */
+.wiz-search-input {
+  width: 100%;
+  padding: 18px 20px 18px 48px;
+  background: var(--wiz-surface);
+  border: 1.5px solid var(--wiz-border);
+  border-radius: 14px;
+  color: var(--wiz-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.wiz-search-input::placeholder {
+  color: var(--wiz-muted);
+  font-weight: 300;
+}
+
+.wiz-search-input:focus {
+  border-color: var(--wiz-teal);
+  box-shadow: 0 0 0 3px var(--wiz-teal-dim);
+}
+
+.wiz-search-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.wiz-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  pointer-events: none;
+}
+
+/* ─── Cards (shared) ───────────────────────────────────────── */
+.wiz-card {
+  background: var(--wiz-surface);
+  border: 1px solid var(--wiz-border);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.wiz-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(20, 184, 166, 0.4);
+}
+
+.wiz-card.selected {
+  border-color: var(--wiz-teal);
+  box-shadow: 0 8px 24px rgba(20, 184, 166, 0.15);
+  background: rgba(20, 184, 166, 0.04);
+}
+
+/* ─── Destination Quick-Pick Grid ──────────────────────────── */
+.wiz-dest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.wiz-dest-card {
+  padding: 16px;
+  text-align: center;
+}
+
+.wiz-dest-card .wiz-dest-emoji {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.wiz-dest-card .wiz-dest-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--wiz-text);
+  margin-bottom: 4px;
+}
+
+.wiz-dest-card .wiz-dest-tags {
+  font-size: 12px;
+  color: var(--wiz-muted);
+  font-weight: 300;
+}
+
+/* ─── Duration Big Number ──────────────────────────────────── */
+.wiz-big-number {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 96px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--wiz-teal), var(--wiz-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  text-align: center;
+  letter-spacing: -0.04em;
+}
+
+.wiz-big-number-label {
+  font-size: 22px;
+  color: var(--wiz-muted);
+  text-align: center;
+  margin-top: 4px;
+  margin-bottom: 28px;
+  font-weight: 400;
+}
+
+/* ─── Custom Range Slider ──────────────────────────────────── */
+.wiz-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--wiz-surface2);
+  outline: none;
+  margin-bottom: 20px;
+}
+
+.wiz-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--wiz-teal);
+  cursor: pointer;
+  box-shadow: 0 0 12px var(--wiz-teal-glow), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.wiz-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.wiz-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--wiz-teal);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 12px var(--wiz-teal-glow), 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Duration Preset Chips ────────────────────────────────── */
+.wiz-presets {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.wiz-preset-chip {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--wiz-border);
+  background: transparent;
+  color: var(--wiz-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.wiz-preset-chip:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  color: var(--wiz-text);
+}
+
+.wiz-preset-chip.active {
+  border-color: var(--wiz-teal);
+  color: var(--wiz-teal);
+  background: var(--wiz-teal-dim);
+}
+
+/* ─── Travelers Section ────────────────────────────────────── */
+.wiz-travelers {
+  text-align: center;
+  padding-top: 8px;
+}
+
+.wiz-travelers-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--wiz-muted);
+  margin-bottom: 16px;
+}
+
+.wiz-travelers-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.wiz-travelers-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1.5px solid var(--wiz-border);
+  background: var(--wiz-surface);
+  color: var(--wiz-text);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.wiz-travelers-btn:hover:not(:disabled) {
+  border-color: var(--wiz-teal);
+  background: var(--wiz-teal-dim);
+}
+
+.wiz-travelers-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.wiz-travelers-count {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--wiz-text);
+  min-width: 60px;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.wiz-travelers-label {
+  font-size: 15px;
+  color: var(--wiz-muted);
+  margin-top: 8px;
+  font-weight: 400;
+}
+
+/* ─── Style Cards ──────────────────────────────────────────── */
+.wiz-style-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.wiz-style-card {
+  padding: 24px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.wiz-style-card .wiz-style-emoji {
+  font-size: 28px;
+}
+
+.wiz-style-card .wiz-style-name {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--wiz-text);
+}
+
+/* ─── Budget Cards ─────────────────────────────────────────── */
+.wiz-budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wiz-budget-card {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.wiz-budget-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.wiz-budget-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wiz-budget-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--wiz-text);
+  margin-bottom: 3px;
+}
+
+.wiz-budget-desc {
+  font-size: 12px;
+  color: var(--wiz-muted);
+  font-weight: 300;
+}
+
+.wiz-budget-right {
+  text-align: right;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wiz-budget-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wiz-teal);
+}
+
+.wiz-radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--wiz-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s;
+  flex-shrink: 0;
+}
+
+.wiz-radio.selected {
+  border-color: var(--wiz-teal);
+  background: var(--wiz-teal);
+}
+
+.wiz-radio.selected::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* ─── Summary Grid ─────────────────────────────────────────── */
+.wiz-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.wiz-summary-cell {
+  background: var(--wiz-surface);
+  border: 1px solid var(--wiz-border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.wiz-summary-cell.full-width {
+  grid-column: 1 / -1;
+}
+
+.wiz-summary-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wiz-muted);
+  margin-bottom: 6px;
+}
+
+.wiz-summary-value {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--wiz-text);
+  text-transform: capitalize;
+}
+
+/* ─── Continue Button ──────────────────────────────────────── */
+.wiz-continue-btn {
+  background: linear-gradient(135deg, var(--wiz-teal), #0891B2);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s;
+  margin-top: 28px;
+  position: relative;
+}
+
+.wiz-continue-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(20, 184, 166, 0.30);
+}
+
+.wiz-continue-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.wiz-continue-arrow {
+  transition: transform 0.25s;
+  display: inline-block;
+}
+
+.wiz-continue-btn:hover:not(:disabled) .wiz-continue-arrow {
+  transform: translateX(4px);
+}
+
+/* ─── Generate Button ──────────────────────────────────────── */
+.wiz-generate-btn {
+  background: linear-gradient(135deg, var(--wiz-teal), #0e7490);
+  border: none;
+  border-radius: 14px;
+  padding: 18px;
+  width: 100%;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s;
+}
+
+.wiz-generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(20, 184, 166, 0.35);
+}
+
+.wiz-generate-btn:disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.wiz-generate-btn .wiz-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: wizSpin 0.7s linear infinite;
+}
+
+@keyframes wizSpin {
+  to { transform: rotate(360deg); }
+}
+
+.wiz-error-msg {
+  color: #FF6B6B;
+  font-size: 13px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+.wiz-timeout-msg {
+  color: var(--wiz-muted);
+  font-size: 13px;
+  text-align: center;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+/* ─── Loading Screen ───────────────────────────────────────── */
+.wiz-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.wiz-loading-spinner-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.wiz-loading-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--wiz-surface2);
+  border-top-color: var(--wiz-teal);
+  border-radius: 50%;
+  animation: wizSpin 1s cubic-bezier(0.6, 0.2, 0.4, 0.8) infinite;
+}
+
+.wiz-loading-center-dot {
+  width: 16px;
+  height: 16px;
+  background: var(--wiz-blue);
+  border-radius: 50%;
+  animation: wizPulse 2s ease-in-out infinite;
+}
+
+@keyframes wizPulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes wizSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.wiz-fact-container {
+  background: var(--wiz-surface);
+  border: 1px solid var(--wiz-border);
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.05);
+}
+
+:root.dark .wiz-fact-container {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.wiz-fact-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--wiz-text);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+
+/* ─── Mobile Responsive ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wiz-headline {
+    font-size: clamp(28px, 7vw, 42px);
+  }
+
+  .wiz-dest-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wiz-style-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  }
+
+  .wiz-big-number {
+    font-size: 72px;
+  }
+
+  .wiz-nav {
+    padding: 12px 16px;
+  }
+
+  .wiz-step-container {
+    padding: 32px 20px 80px;
+  }
+
+  .wiz-search-input {
+    font-size: 16px;
+  }
+
+  .wiz-presets {
+    justify-content: center;
+  }
+
+  .wiz-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wiz-budget-card {
+    padding: 16px;
+  }
+
+  .wiz-budget-price {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wiz-style-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .wiz-style-card {
+    padding: 16px 8px;
+  }
+
+  .wiz-dest-card {
+    padding: 12px 8px;
+  }
+}

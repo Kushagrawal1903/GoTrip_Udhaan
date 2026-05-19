@@ -94,6 +94,16 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
       </Route>
 
+      {/* ─── Trip Wizard — full-screen immersive route (no Navbar/Footer) ─── */}
+      <Route
+        path="/plan"
+        element={
+          <ProtectedRoute>
+            <PlanTrip />
+          </ProtectedRoute>
+        }
+      />
+
       {/* ─── Public/standalone routes (with Navbar + Footer) ─── */}
       <Route
         path="*"
@@ -105,14 +115,6 @@ export default function App() {
                 <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Home />} />
                 <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
                 <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} />
-                <Route
-                  path="/plan"
-                  element={
-                    <ProtectedRoute>
-                      <PlanTrip />
-                    </ProtectedRoute>
-                  }
-                />
                 <Route
                   path="/trip/:id"
                   element={
