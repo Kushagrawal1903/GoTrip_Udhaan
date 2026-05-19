@@ -30,6 +30,10 @@ function initializeSocket(httpServer) {
     });
 
     io.on('connection', (socket) => {
+        if (socket.userId) {
+            socket.join(`user:${socket.userId}`);
+        }
+
         socket.on('join-trip', (tripId) => {
             if (tripId) {
                 socket.join(`trip:${tripId}`);

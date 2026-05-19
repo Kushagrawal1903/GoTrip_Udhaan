@@ -36,6 +36,42 @@ export default function TripResult() {
     // Determine ownership
     const isOwner = trip && user && trip.userId === user.id;
 
+    // Check if the current user is a pending collaborator
+    const pendingCollaborator = trip && user && !isOwner && (trip.collaborators || []).find(
+        c => (c.userId?._id?.toString() === user.id || c.userId?.toString() === user.id || c.email?.toLowerCase() === user.email?.toLowerCase()) && c.status === 'pending'
+    );
+
+    const [respondingCollab, setRespondingCollab] = useState(false);
+
+    const handleRespondInvite = async (action) => {
+        setRespondingCollab(true);
+        try {
+            const res = await api.post('/collaborate/respond', { tripId: id, action });
+            if (res.data.success) {
+                if (action === 'accept') {
+                    // Update local trip state to accepted
+                    setTrip(prev => ({
+                        ...prev,
+                        collaborators: prev.collaborators.map(c => 
+                            (c.userId?._id?.toString() === user.id || c.userId?.toString() === user.id || c.email?.toLowerCase() === user.email?.toLowerCase())
+                                ? { ...c, status: 'accepted', acceptedAt: new Date() }
+                                : c
+                        )
+                    }));
+                    // Reload collaborators in the collab hook
+                    collab.fetchCollaborators();
+                } else {
+                    // Declined: redirect back to dashboard
+                    navigate('/dashboard');
+                }
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || 'Failed to respond to invitation.');
+        } finally {
+            setRespondingCollab(false);
+        }
+    };
+
     // Packing list hook
     const packing = usePackingList(id, trip?.packingList);
 
@@ -291,6 +327,63 @@ export default function TripResult() {
 
     return (
         <div className="animate-fade-in-up" style={{ padding: '40px 24px' }}>
+            {/* Accept Invitation Banner */}
+            {pendingCollaborator && (
+                <div style={{
+                    maxWidth: 1000,
+                    margin: '0 auto 24px',
+                    padding: '20px 24px',
+                    borderRadius: 16,
+                    background: 'linear-gradient(135deg, rgba(13, 148, 136, 0.15) 0%, rgba(15, 118, 110, 0.15) 100%)',
+                    border: '1px solid rgba(13, 148, 136, 0.3)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 16,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    textAlign: 'center',
+                    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '2rem' }}>🤝</span>
+                        <div style={{ textAlign: 'left' }}>
+                            <h4 style={{ margin: 0, fontWeight: 700, color: 'var(--color-primary-dark)' }}>
+                                You are invited to collaborate!
+                            </h4>
+                            <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                Join as a collaborator to plan, add comments, and suggest itinerary modifications.
+                            </p>
+                        </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        <button
+                            className="btn-primary"
+                            disabled={respondingCollab}
+                            onClick={() => handleRespondInvite('accept')}
+                            style={{ padding: '8px 24px', fontSize: '0.85rem' }}
+                        >
+                            {respondingCollab ? 'Accepting...' : 'Accept Invite'}
+                        </button>
+                        <button
+                            className="btn-outline"
+                            disabled={respondingCollab}
+                            onClick={() => handleRespondInvite('decline')}
+                            style={{ 
+                                padding: '8px 24px', 
+                                fontSize: '0.85rem', 
+                                color: '#ef4444', 
+                                border: '1px solid rgba(239, 68, 68, 0.2)',
+                                background: 'transparent'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)' }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+                        >
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Back + Action buttons */}
             <div style={{
                 maxWidth: 1000,

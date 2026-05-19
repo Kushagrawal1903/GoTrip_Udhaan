@@ -31,6 +31,10 @@ const notificationSchema = new mongoose.Schema(
             ref: 'Trip',
             default: null,
         },
+        shareToken: {
+            type: String,
+            default: null,
+        },
     },
     { timestamps: true }
 );

@@ -39,7 +39,11 @@ export default function NotificationDropdown({ userId }) {
 
     const handleClick = (n) => {
         if (!n.read) markRead.mutate(n._id);
-        if (n.tripId) navigate(`/trip/${n.tripId}`);
+        if (n.type === 'collab_invite' && n.shareToken) {
+            navigate(`/join/${n.shareToken}`);
+        } else if (n.tripId) {
+            navigate(`/trip/${n.tripId}`);
+        }
         setOpen(false);
     };
 

@@ -164,7 +164,7 @@ router.get('/:id', auth, async (req, res, next) => {
             _id: req.params.id,
             $or: [
                 { userId: req.userId },
-                { 'collaborators.userId': req.userId, 'collaborators.status': 'accepted' },
+                { 'collaborators.userId': req.userId, 'collaborators.status': { $in: ['accepted', 'pending'] } },
             ],
         });
 

@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const auth = require('../middleware/auth');
 const Trip = require('../models/Trip');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { sendInviteEmail } = require('../services/emailService');
 
 const router = express.Router();
@@ -96,6 +97,19 @@ module.exports = function createCollaborateRouter(io) {
             });
             await trip.save();
 
+            // Create Notification
+            const notification = await Notification.create({
+                userId: invitedUser._id,
+                type: 'collab_invite',
+                message: `${req.user.name} invited you to collaborate on their trip to ${trip.destination.split(',')[0]}.`,
+                tripId: trip._id,
+                shareToken: trip.shareToken,
+            });
+
+            if (io) {
+                io.to(`user:${invitedUser._id}`).emit('new-notification', notification);
+            }
+
             // Send invite email asynchronously
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
             const inviteUrl = `${frontendUrl}/join/${trip.shareToken}`;
@@ -186,6 +200,16 @@ module.exports = function createCollaborateRouter(io) {
                     existingCollab.status = 'accepted';
                     existingCollab.acceptedAt = new Date();
                     await trip.save();
+
+                    const notification = await Notification.create({
+                        userId: trip.userId,
+                        type: 'collab_accepted',
+                        message: `${req.user.name} accepted your invitation to collaborate on ${trip.destination.split(',')[0]}.`,
+                        tripId: trip._id,
+                    });
+                    if (io) {
+                        io.to(`user:${trip.userId}`).emit('new-notification', notification);
+                    }
                 }
                 return res.json({
                     success: true,
@@ -209,6 +233,16 @@ module.exports = function createCollaborateRouter(io) {
                 status: 'accepted',
             });
             await trip.save();
+
+            const notification = await Notification.create({
+                userId: trip.userId,
+                type: 'collab_accepted',
+                message: `${req.user.name} joined your trip to ${trip.destination.split(',')[0]} as a collaborator.`,
+                tripId: trip._id,
+            });
+            if (io) {
+                io.to(`user:${trip.userId}`).emit('new-notification', notification);
+            }
 
             res.json({
                 success: true,
@@ -306,6 +340,19 @@ module.exports = function createCollaborateRouter(io) {
 
             // Get the saved comment with _id
             const savedComment = trip.comments[trip.comments.length - 1];
+
+            // Notify owner if commenter is not owner
+            if (trip.userId.toString() !== req.userId.toString()) {
+                const notification = await Notification.create({
+                    userId: trip.userId,
+                    type: 'comment_added',
+                    message: `${req.user.name} added a comment to your trip to ${trip.destination.split(',')[0]}.`,
+                    tripId: trip._id,
+                });
+                if (io) {
+                    io.to(`user:${trip.userId}`).emit('new-notification', notification);
+                }
+            }
 
             // Emit to all users in the trip room
             if (io) {
@@ -407,7 +454,7 @@ module.exports = function createCollaborateRouter(io) {
                 _id: tripId,
                 $or: [
                     { userId: req.userId },
-                    { 'collaborators.userId': req.userId, 'collaborators.status': 'accepted' },
+                    { 'collaborators.userId': req.userId, 'collaborators.status': { $in: ['accepted', 'pending'] } },
                 ],
             }).populate('collaborators.userId', 'name email');
 
@@ -422,6 +469,72 @@ module.exports = function createCollaborateRouter(io) {
                     isOwner: trip.userId.toString() === req.userId.toString(),
                 },
             });
+        } catch (error) {
+            next(error);
+        }
+    });
+
+    /**
+     * POST /api/collaborate/respond
+     * Accept or decline a collaboration invitation
+     */
+    router.post('/respond', auth, async (req, res, next) => {
+        try {
+            const { tripId, action } = req.body;
+
+            if (!tripId || !action || !['accept', 'decline'].includes(action)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'tripId and action (accept/decline) are required.',
+                });
+            }
+
+            const trip = await Trip.findById(tripId);
+            if (!trip) {
+                return res.status(404).json({ success: false, message: 'Trip not found.' });
+            }
+
+            const collaborator = trip.collaborators.find(
+                c => c.userId?.toString() === req.userId.toString()
+            );
+
+            if (!collaborator) {
+                return res.status(404).json({ success: false, message: 'You are not invited to collaborate on this trip.' });
+            }
+
+            if (action === 'accept') {
+                collaborator.status = 'accepted';
+                collaborator.acceptedAt = new Date();
+                await trip.save();
+
+                const notification = await Notification.create({
+                    userId: trip.userId,
+                    type: 'collab_accepted',
+                    message: `${req.user.name} accepted your invitation to collaborate on ${trip.destination.split(',')[0]}.`,
+                    tripId: trip._id,
+                });
+
+                if (io) {
+                    io.to(`user:${trip.userId}`).emit('new-notification', notification);
+                }
+
+                return res.json({
+                    success: true,
+                    message: 'Invitation accepted successfully!',
+                    data: { collaborators: trip.collaborators },
+                });
+            } else {
+                trip.collaborators = trip.collaborators.filter(
+                    c => c.userId?.toString() !== req.userId.toString()
+                );
+                await trip.save();
+
+                return res.json({
+                    success: true,
+                    message: 'Invitation declined.',
+                    data: { collaborators: trip.collaborators },
+                });
+            }
         } catch (error) {
             next(error);
         }
