@@ -105,6 +105,7 @@ export default function App() {
         }
       />
 
+
       {/* ─── Public/standalone routes (with Navbar + Footer) ─── */}
       <Route
         path="*"

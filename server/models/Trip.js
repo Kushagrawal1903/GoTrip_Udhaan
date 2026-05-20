@@ -111,6 +111,93 @@ const tripSchema = new mongoose.Schema(
             },
             lastSharedAt: Date,
         },
+
+        // ─── FEATURE 6: Cinematic Travel Stories ─────────────
+        story: {
+            isPublished: { type: Boolean, default: false },
+            slug: { type: String, unique: true, sparse: true },
+
+            // Trip Personality System
+            personality: {
+                emoji: String,              // ✨ 🏔 🌊
+                vibeLabel: String,          // "Romantic Alpine Escape"
+                emotionalTone: String,      // "intimate", "adventurous", "serene"
+                description: String,        // "A slow, sun-drenched journey…"
+            },
+
+            // Emotional Journey Engine
+            emotionalArc: {
+                beginning: String,          // Anticipation & excitement
+                risingAction: String,       // Discovery & immersion
+                peakMoment: String,         // Unforgettable wow
+                windDown: String,           // Reflective slowness
+                farewellMoment: String,     // Emotional closure
+            },
+
+            // AI-generated cinematic narrative
+            narrative: {
+                headline: String,           // "7 Unforgettable Days in Switzerland"
+                subtitle: String,           // "A romantic alpine escape"
+                introduction: String,       // 2-3 sentence mood paragraph
+                closingParagraph: String,   // Emotional farewell
+                dayNarratives: [{
+                    dayIndex: Number,
+                    title: String,          // Cinematic day title
+                    mood: String,           // "adventurous", "reflective"
+                    narrative: String,       // 1-2 sentence day summary
+                }],
+            },
+
+            // Signature WOW Moment
+            wowMoment: {
+                dayIndex: Number,
+                timeSlot: String,           // "Morning", "Evening"
+                title: String,              // "Sunrise Over Jungfrau"
+                narrative: String,          // Editorial storytelling
+                whyItMatters: String,       // Emotional explanation
+                placeName: String,
+            },
+
+            // Cover image
+            coverImage: {
+                url: String,
+                alt: String,
+            },
+
+            // SEO metadata
+            seo: {
+                title: String,
+                description: String,
+                keywords: [String],
+            },
+
+            // Travel insights
+            insights: {
+                bestSeason: String,
+                localEtiquette: [String],
+                weather: String,
+                hiddenGems: [String],
+                insiderTips: [String],
+            },
+
+            // Engagement metrics
+            metrics: {
+                views: { type: Number, default: 0 },
+                clones: { type: Number, default: 0 },
+                shares: { type: Number, default: 0 },
+                saves: { type: Number, default: 0 },
+                avgScrollDepth: { type: Number, default: 0 },
+                ctaClicks: { type: Number, default: 0 },
+            },
+
+            publishedAt: Date,
+        },
+
+        // Wishlist/saved stories (for logged-in users who save others' stories)
+        savedStories: [{
+            tripId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip' },
+            savedAt: { type: Date, default: Date.now },
+        }],
     },
     {
         timestamps: true,
@@ -119,5 +206,9 @@ const tripSchema = new mongoose.Schema(
 
 // Index for collaboration queries
 tripSchema.index({ 'collaborators.email': 1 });
+
+// Indexes for Cinematic Travel Stories
+tripSchema.index({ 'story.slug': 1 }, { unique: true, sparse: true });
+tripSchema.index({ 'story.isPublished': 1, 'story.publishedAt': -1 });
 
 module.exports = mongoose.model('Trip', tripSchema);

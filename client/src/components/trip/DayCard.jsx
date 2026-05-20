@@ -90,6 +90,25 @@ export default function DayCard({
                 </div>
             </div>
 
+            {/* ─── DAY NARRATIVE INTRO ─────────────────────────────── */}
+            {day.narrative && !isEditingThisDay && (
+                <div style={{
+                    padding: '16px 20px 8px',
+                    borderBottom: '1px solid var(--border-color)',
+                }}>
+                    <p style={{
+                        fontFamily: "'Cormorant Garamond', serif",
+                        fontSize: '1.05rem',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.7,
+                        fontStyle: 'italic',
+                        margin: 0,
+                    }}>
+                        {day.narrative}
+                    </p>
+                </div>
+            )}
+
             {/* ─── EDIT MODE BANNER ─────────────────────────────── */}
             {isEditingThisDay && (
                 <div className="edit-banner">

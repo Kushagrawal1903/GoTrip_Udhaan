@@ -1,0 +1,792 @@
+/* ─── CINEMATIC TRAVEL STORIES ─────────────────────────────── */
+
+/* Scroll reveal system */
+.story-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.story-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Progress bar */
+.story-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: var(--color-primary);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ─── HERO ──────────────────────────────────────────────────── */
+.story-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: storyKenBurns 20s ease-in-out infinite alternate;
+}
+
+@keyframes storyKenBurns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.08);
+  }
+}
+
+.story-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.story-hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px;
+  max-width: 900px;
+}
+
+.story-hero-pills {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.story-pill {
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.story-hero-destination {
+  font-family: 'futura', sans-serif;
+  font-weight: 900;
+  font-size: clamp(4.8rem, 12vw, 9rem);
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 40px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.story-hero-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+.story-hero-personality {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.story-scroll-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: storyPulse 2s ease-in-out infinite;
+}
+
+.story-scroll-hint span {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes storyPulse {
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ─── NARRATIVE SECTION ─────────────────────────────────────── */
+.story-narrative {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 100px 24px 80px;
+  text-align: center;
+}
+
+.story-narrative-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.15rem, 2.5vw, 1.45rem);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-weight: 600;
+}
+
+/* ─── EMOTIONAL ARC ─────────────────────────────────────────── */
+.story-arc {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.story-arc-item {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+  align-items: flex-start;
+}
+
+.story-arc-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 6px;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+}
+
+.story-arc-line {
+  width: 1px;
+  height: 32px;
+  background: var(--border-color);
+  margin-left: 5px;
+}
+
+.story-arc-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.story-arc-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ─── DAY TIMELINE ──────────────────────────────────────────── */
+.story-days {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+.story-day-section {
+  margin-bottom: 80px;
+}
+
+.story-day-header {
+  margin-bottom: 24px;
+}
+
+.story-day-number {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.story-day-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.story-day-narrative {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+.story-day-activities {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.story-activity {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.story-activity:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.story-activity-time {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  min-width: 70px;
+  padding-top: 2px;
+}
+
+.story-activity-time.morning {
+  color: #d97706;
+}
+
+.story-activity-time.afternoon {
+  color: #0d9488;
+}
+
+.story-activity-time.evening {
+  color: #7c3aed;
+}
+
+.story-activity-time.night {
+  color: #4f46e5;
+}
+
+.story-activity-content h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.story-activity-content p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.story-activity-cost {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* ─── WOW MOMENT ────────────────────────────────────────────── */
+.story-wow {
+  position: relative;
+  padding: 100px 24px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.06) 0%, rgba(217, 119, 6, 0.04) 100%);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.story-wow-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-accent);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.story-wow-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 5vw, 2.8rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  line-height: 1.15;
+}
+
+.story-wow-narrative {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  color: var(--text-secondary);
+  max-width: 650px;
+  margin: 0 auto 20px;
+  line-height: 1.8;
+}
+
+.story-wow-why {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* ─── HOTELS ────────────────────────────────────────────────── */
+.story-hotels {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.story-section-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.story-section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.story-hotels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.story-hotel-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.story-hotel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.story-hotel-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.story-hotel-img-placeholder {
+  width: 100%;
+  height: 200px;
+  background: #334155;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+
+.story-hotel-body {
+  padding: 20px;
+}
+
+.story-hotel-body h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.story-hotel-body .price {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.story-hotel-body .desc {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ─── INSIGHTS ──────────────────────────────────────────────── */
+.story-insights {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.story-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.story-insight-card {
+  padding: 24px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.story-insight-card h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.story-insight-card p,
+.story-insight-card li {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.story-insight-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.story-insight-card li::before {
+  content: '→ ';
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+/* ─── GALLERY ───────────────────────────────────────────────── */
+.story-gallery {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.story-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.story-gallery-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.story-gallery-img:hover {
+  transform: scale(1.02);
+}
+
+/* ─── ITINERARY COLLAPSE ────────────────────────────────────── */
+.story-itinerary {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.story-itinerary-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.story-itinerary-toggle:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ─── CTA ───────────────────────────────────────────────────── */
+.story-cta {
+  text-align: center;
+  padding: 100px 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(13, 148, 136, 0.04) 100%);
+}
+
+.story-cta-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.story-cta-sub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 500px;
+  margin: 0 auto 32px;
+  line-height: 1.6;
+}
+
+.story-cta-closing {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+.story-cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.story-cta-primary {
+  padding: 16px 40px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(13, 148, 136, 0.3);
+  font-family: inherit;
+}
+
+.story-cta-primary:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(13, 148, 136, 0.4);
+}
+
+.story-cta-secondary {
+  padding: 15px 32px;
+  background: transparent;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.story-cta-secondary:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.story-cta-proof {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+/* ─── SIMILAR STORIES ───────────────────────────────────────── */
+.story-similar {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 100px;
+}
+
+.story-similar-scroll {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.story-similar-card {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: block;
+}
+
+.story-similar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.story-similar-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.story-similar-card-body {
+  padding: 16px;
+}
+
+.story-similar-card-body h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.story-similar-card-body p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ─── MOBILE ────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .story-hero-content {
+    padding: 0 20px 60px;
+  }
+
+  .story-narrative {
+    padding: 64px 20px 48px;
+  }
+
+  .story-arc {
+    padding: 0 20px 48px;
+  }
+
+  .story-days {
+    padding: 0 16px 40px;
+  }
+
+  .story-day-section {
+    margin-bottom: 48px;
+  }
+
+  .story-activity {
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+  }
+
+  .story-activity-time {
+    min-width: unset;
+  }
+
+  .story-wow {
+    padding: 64px 20px;
+  }
+
+  .story-hotels {
+    padding: 48px 16px;
+  }
+
+  .story-hotels-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-insights {
+    padding: 0 16px 48px;
+  }
+
+  .story-insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-gallery {
+    padding: 0 16px 48px;
+  }
+
+  .story-gallery-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .story-gallery-img {
+    height: 160px;
+  }
+
+  .story-itinerary {
+    padding: 0 16px 48px;
+  }
+
+  .story-cta {
+    padding: 64px 20px;
+  }
+
+  .story-similar {
+    padding: 0 16px 64px;
+  }
+
+  .story-similar-scroll {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .story-gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .story-hero-pills {
+    gap: 6px;
+  }
+
+  .story-pill {
+    font-size: 0.7rem;
+    padding: 4px 12px;
+  }
+}

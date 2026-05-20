@@ -5,6 +5,8 @@ import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
+import StoryHero from '../components/story/StoryHero';
+import '../styles/story.css';
 
 /**
  * PublicTripResult — public read-only view of a shared trip.
@@ -75,6 +77,17 @@ export default function PublicTripResult() {
     const progress = { checked, total, percent };
 
     return (
+        <>
+            <StoryHero story={{
+                destination: trip.destination,
+                destinationImage: trip.destinationImage,
+                duration: trip.duration,
+                budget: trip.budget,
+                travelers: trip.travelers,
+                travelStyle: trip.travelStyle,
+                tripData: trip.tripData,
+                story: trip.story || {}
+            }} />
         <div className="animate-fade-in-up" style={{ padding: '40px 24px' }}>
             {/* Header banner for public viewers */}
             <div style={{
@@ -144,5 +157,6 @@ export default function PublicTripResult() {
                 </div>
             )}
         </div>
+        </>
     );
 }

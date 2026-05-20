@@ -30,7 +30,7 @@ api.interceptors.response.use(
             localStorage.removeItem('gotrip-token');
             // Only redirect if on a protected route
             const isAuthRoute = window.location.pathname.includes('/login') || window.location.pathname.includes('/register');
-            const isPublicRoute = window.location.pathname.startsWith('/share/') || window.location.pathname === '/';
+            const isPublicRoute = window.location.pathname.startsWith('/share/') || window.location.pathname.startsWith('/story/') || window.location.pathname === '/';
             if (!isAuthRoute && !isPublicRoute) {
                 window.location.href = '/login';
             }

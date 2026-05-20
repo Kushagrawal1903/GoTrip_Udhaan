@@ -15,6 +15,9 @@ import useSocket from '../hooks/useSocket';
 import useTripEmail from '../hooks/useTripEmail';
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
+import StoryHero from '../components/story/StoryHero';
+import '../styles/story.css';
+
 /**
  * TripResult — view a single saved trip with packing list, PDF export, and collaboration
  */
@@ -28,6 +31,7 @@ export default function TripResult() {
     const [exporting, setExporting] = useState(false);
     const [collabOpen, setCollabOpen] = useState(false);
     const [sharePanelOpen, setSharePanelOpen] = useState(false);
+
 
     // ─── Itinerary Editing State ─────────────────────────────
     const [editingDay, setEditingDay] = useState(null);
@@ -328,7 +332,18 @@ export default function TripResult() {
     const collabCount = (trip.collaborators || []).length;
 
     return (
-        <div className="animate-fade-in-up" style={{ padding: '40px 24px' }}>
+        <>
+            <StoryHero story={{
+                destination: trip.destination,
+                destinationImage: trip.destinationImage,
+                duration: trip.duration,
+                budget: trip.budget,
+                travelers: trip.travelers,
+                travelStyle: trip.travelStyle,
+                tripData: trip.tripData,
+                story: trip.story || {}
+            }} />
+            <div className="animate-fade-in-up" style={{ padding: '40px 24px' }}>
             {/* Accept Invitation Banner */}
             {pendingCollaborator && (
                 <div style={{
@@ -585,6 +600,8 @@ export default function TripResult() {
                     >
                         Plan New Trip
                     </button>
+
+
                 </div>
             </div>
 
@@ -653,6 +670,9 @@ export default function TripResult() {
                 onClose={() => setSharePanelOpen(false)}
                 trip={trip}
             />
+
+
         </div>
+        </>
     );
 }

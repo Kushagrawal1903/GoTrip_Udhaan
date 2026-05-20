@@ -18,83 +18,18 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving, 
         <div style={{ maxWidth: 1000, margin: '0 auto' }} className="mobile-p-md">
             <div className="animate-fade-in-up">
 
-                {/* ─── DESTINATION HERO BANNER ───────────────────── */}
-                <div style={{
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    marginBottom: 24,
-                    position: 'relative',
-                    height: 'clamp(200px, 30vh, 280px)',
-                    background: '#1e293b',
-                    boxShadow: 'var(--shadow-lg)',
-                }}>
-                    {showHeroImg && (
-                        <img
-                            src={destinationImage}
-                            alt={tripData.destination}
-                            onError={() => setHeroImgFailed(true)}
-                            style={{
-                                position: 'absolute', inset: 0,
-                                width: '100%', height: '100%',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    )}
-                    {/* Overlay */}
-                    <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.3) 100%)',
-                        pointerEvents: 'none',
-                    }} />
-                    {/* Text */}
-                    <div style={{ 
-                        position: 'absolute', bottom: 0, left: 0, right: 0, 
-                        padding: 'clamp(16px, 4vw, 28px)', 
-                        zIndex: 1 
-                    }}>
-                        <h1 style={{
-                            fontWeight: 800,
-                            fontSize: 'clamp(1.5rem, 5vw, 2.4rem)',
-                            color: '#fff', marginBottom: 8,
-                            letterSpacing: '-0.02em',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                        }}>
-                            {tripData.destination}
-                        </h1>
+                {/* ─── NARRATIVE PARAGRAPH ──────────────────────── */}
+                {tripData.narrativeParagraph && (
+                    <div className="story-narrative">
+                        <p className="story-narrative-text">
+                            {tripData.narrativeParagraph}
+                        </p>
                     </div>
-                </div>
+                )}
 
-                {/* ─── TRIP OVERVIEW BADGES ──────────────────────── */}
+                {/* ─── TRIP OVERVIEW ─────────────────────────────── */}
                 <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
-                    {/* Top row: Days, Travelers, Category */}
-                    <div style={{ 
-                        display: 'flex', gap: 8, flexWrap: 'nowrap', 
-                        overflowX: 'auto', width: '100%', justifyContent: 'center',
-                        scrollbarWidth: 'none', msOverflowStyle: 'none',
-                        padding: '0 4px'
-                    }} className="no-scrollbar">
-                        {[
-                            { val: `${tripData.duration} Days`, icon: '📅' },
-                            { val: `${tripData.travelers} ${tripData.travelers === 1 ? 'Traveler' : 'Travelers'}`, icon: '👤', hide: !tripData.travelers },
-                            { val: tripData.budgetCategory, icon: '💰' }
-                        ].map((badge, idx) => !badge.hide && (
-                            <div key={idx} style={{
-                                padding: '6px 12px', borderRadius: 10,
-                                background: 'var(--bg-card)',
-                                color: 'var(--text-primary)',
-                                fontSize: '0.78rem', fontWeight: 700,
-                                border: '1px solid var(--border-color)',
-                                boxShadow: 'var(--shadow-sm)',
-                                display: 'flex', alignItems: 'center', gap: 5,
-                                whiteSpace: 'nowrap', flexShrink: 0,
-                            }}>
-                                <span style={{ opacity: 0.8 }}>{badge.icon}</span>
-                                {badge.val}
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Bottom row: Detailed Budget Range (Full width/prominent) */}
+                    {/* Detailed Budget Range (Full width/prominent) */}
                     {tripData.totalEstimatedBudget && (
                         <div style={{
                             padding: '12px 20px', borderRadius: 14,
@@ -213,7 +148,17 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving, 
                     </div>
                 )}
 
-
+                {/* ─── WOW MOMENT ────────────────────────────────── */}
+                {tripData.wowMoment && (
+                    <div className="story-wow" style={{ marginBottom: 28, borderRadius: 16 }}>
+                        <p className="story-wow-label">✦ The Moment You'll Never Forget</p>
+                        <h3 className="story-wow-title">{tripData.wowMoment.title}</h3>
+                        <p className="story-wow-narrative">{tripData.wowMoment.description}</p>
+                        {tripData.wowMoment.reflection && (
+                            <p className="story-wow-why">{tripData.wowMoment.reflection}</p>
+                        )}
+                    </div>
+                )}
 
                 {/* ─── ITINERARY ─────────────────────────────────── */}
                 {tripData.itinerary?.length > 0 && (

@@ -88,11 +88,21 @@ DETAILED INSTRUCTIONS:
 6. For each hotel, provide an "imageQuery" field with a descriptive search query (e.g., "Taj Lake Palace Udaipur exterior view").
 7. For EVERY activity, include "placeName" and "mapsLink" (Google Maps search URL). This is CRITICAL.
 8. Include at least 5 detailed travel tips specific to ${destination}, each tip being a full sentence with actionable advice.
+9. Write a "narrativeParagraph" — a vivid, editorial 2-3 sentence paragraph (40-60 words) about what makes ${destination} special. Write as a travel writer, with sensory details. NOT generic tourism copy. Example: "Indore does not reveal itself to the passive observer. It demands dirt on your boots and a willingness to navigate midnight crowds for charcoal-roasted street delicacies."
+10. Write a "wowMoment" — the single most unforgettable experience in ${destination}. Include a vivid title, a 2-3 sentence sensory description, and a reflective one-liner about why it matters.
+11. For EACH day in the itinerary, include a "narrative" — a vivid, cinematic 2-sentence description (25-40 words) that paints what the traveler will experience that day. Write in second person ("you"). Example: "Scramble down slick wet rocks of Patalpani, where the air vibrates with the roar of falling water. The evening sun paints the valley a deep, bruised violet."
 
 OUTPUT FORMAT:
 Respond ONLY with valid JSON. No markdown, no code blocks, no explanations before or after. Just pure JSON in this exact structure:
 {
   "destination": "${destination}",
+  "subtitle": "A poetic, cinematic 5-10 word subtitle capturing the essence of ${destination}",
+  "narrativeParagraph": "A vivid 2-3 sentence editorial paragraph about what makes this destination special.",
+  "wowMoment": {
+    "title": "A short evocative title for the must-do experience",
+    "description": "A vivid 2-3 sentence sensory description of the experience.",
+    "reflection": "A single reflective sentence about why this moment matters."
+  },
   "duration": ${duration},
   "travelers": ${travelers},
   "budgetCategory": "${budget}",
@@ -121,6 +131,7 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
     {
       "day": 1,
       "title": "A short 3-5 word Title",
+      "narrative": "A vivid 2-sentence cinematic description of what this day feels like.",
       "activities": [
         {
           "time": "Morning",
@@ -162,7 +173,7 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
   "tips": ["Tip 1: Short actionable advice (max 10 words).", "Tip 2: ...", "Tip 3: ...", "Tip 4: ...", "Tip 5: ..."]
 }
 
-REMEMBER: Be extremely brief. Max 5-10 words per description. Generate content for ALL ${duration} days.`;
+REMEMBER: Be extremely brief for activity descriptions (5-10 words). But write rich, sensory prose for narrativeParagraph, wowMoment, and day narratives. Generate content for ALL ${duration} days.`;
 }
 
 /**
