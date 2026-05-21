@@ -85,6 +85,31 @@ const userSchema = new mongoose.Schema(
         plan: { type: String, enum: ['free', 'pro'], default: 'free' },
         planExpiresAt: { type: Date, default: null },
         whatsappOptIn: { type: Boolean, default: false },
+
+        // ─── Travel Passport ────────────────────────────────
+        passport: {
+            travelPersonality: {
+                emoji: String,
+                label: String,
+                emotionalTone: String,
+                description: String,
+            },
+            memories: [{
+                tripId: { type: mongoose.Schema.Types.ObjectId, ref: 'Trip' },
+                memoryCapsule: String,
+                memoryMood: {
+                    emoji: String,
+                    label: String,
+                },
+                favoriteExperience: String,
+                favoriteMoment: String,
+                isCoreMemory: { type: Boolean, default: false },
+                stampColor: String,
+                generatedAt: Date,
+            }],
+            reflectionSummary: String,
+            generatedAt: Date,
+        },
     },
     {
         timestamps: true,

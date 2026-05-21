@@ -110,6 +110,10 @@ app.use('/api/share', shareRoutes);
 // User profile & settings routes
 app.use('/api/user', userRoutes);
 
+// Travel Passport routes
+const passportRoutes = require('./routes/passportRoutes');
+app.use('/api/passport', passportRoutes);
+
 // ─── ERROR HANDLING ─────────────────────────────────────────
 
 // 404 handler for unknown routes

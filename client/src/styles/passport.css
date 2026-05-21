@@ -1,0 +1,850 @@
+/* ═══════════════════════════════════════════════════════════════
+   MY PASSPORT — Luxury Digital Experience Styles
+   Visual Fidelity Target: Hyper-realistic leather, aged paper, tactile.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Fonts required: Playfair Display (Serif headers), Cormorant Garamond (Editorial/Body), DM Sans (Sans-serif UI), Caveat (Handwriting) */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+:root {
+  /* Environment */
+  --pp-env-bg: #110d0a;
+  --pp-env-light: rgba(45, 35, 25, 0.4);
+
+  /* Leather Passport Cover */
+  --pp-leather-dark: #271a11;
+  --pp-leather-base: #332317;
+  --pp-leather-light: #443021;
+  --pp-gold: #c39d5b;
+  --pp-gold-dark: #a27e44;
+  
+  /* Paper Pages */
+  --pp-paper-base: #eaddc5;
+  --pp-paper-highlight: #f4ebd8;
+  --pp-paper-shadow: #d1be9e;
+  --pp-paper-edge: #b59f7d;
+
+  /* Ink & Typography */
+  --pp-ink-black: #1a1714;
+  --pp-ink-muted: #4a433a;
+  --pp-ink-faint: rgba(74, 67, 58, 0.4);
+  --pp-stamp-red: #a44338;
+
+  /* Typography Stacks */
+  --pp-font-display: 'Playfair Display', serif;
+  --pp-font-editorial: 'Cormorant Garamond', serif;
+  --pp-font-sans: 'DM Sans', sans-serif;
+  --pp-font-handwriting: 'Caveat', cursive;
+
+  /* Physics / Geometry */
+  --pp-book-width-desktop: 1000px; /* Two pages spread */
+  --pp-book-height-desktop: 700px;
+  --pp-book-width-mobile: 90vw; /* Single page */
+  --pp-book-height-mobile: 75vh;
+  --pp-page-radius: 8px 14px 14px 8px; /* For right side pages */
+}
+
+/* ─── PROCEDURAL TEXTURES (SVG Filters encoded as URLs) ─── */
+/* 
+   We use SVG turbulence filters embedded as background images.
+   This avoids external image loads, prevents lag, and allows CSS blend modes. 
+*/
+
+/* Leather Grain Texture */
+.pp-texture-leather {
+  background: radial-gradient(circle at center, var(--pp-leather-base) 0%, var(--pp-leather-dark) 100%);
+  position: relative;
+}
+.pp-texture-leather::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Aged Paper Texture */
+.pp-texture-paper {
+  background-color: var(--pp-paper-base);
+  background-image: radial-gradient(circle at 50% 50%, var(--pp-paper-highlight) 0%, var(--pp-paper-base) 70%, var(--pp-paper-shadow) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.pp-texture-paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 10;
+}
+/* Center Binding Shadow (Spine) */
+.pp-spine-shadow-left {
+  box-shadow: inset -40px 0 60px -20px rgba(74, 55, 38, 0.4);
+}
+.pp-spine-shadow-right {
+  box-shadow: inset 40px 0 60px -20px rgba(74, 55, 38, 0.4);
+}
+
+/* ─── GLOBAL PASSPORT ENVIRONMENT ─── */
+.passport-environment {
+  position: fixed;
+  inset: 0;
+  background-color: var(--pp-env-bg);
+  background-image: radial-gradient(circle at 50% 40%, var(--pp-env-light) 0%, var(--pp-env-bg) 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999; /* Absolute top layer over entire app */
+  overflow: hidden;
+  font-family: var(--pp-font-sans);
+  color: var(--pp-ink-black);
+}
+
+/* Background elements (Compass, desk hints - faintly visible via SVG/CSS) */
+.passport-desk-element {
+  position: absolute;
+  opacity: 0.05;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+/* ─── 3D BOOK CONTAINER ─── */
+.passport-stage {
+  perspective: 2500px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passport-book-wrapper {
+  position: relative;
+  width: var(--pp-book-width-desktop);
+  height: var(--pp-book-height-desktop);
+  transform-style: preserve-3d;
+  /* Centered perfectly */
+}
+
+/* ─── PAGE STRUCTURE ─── */
+.passport-page {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden; /* Important for flips */
+}
+
+.passport-page.left {
+  left: 0;
+  transform-origin: right center;
+  border-radius: 12px 0 0 12px;
+}
+
+.passport-page.right {
+  right: 0;
+  transform-origin: left center;
+  border-radius: 0 12px 12px 0;
+}
+
+/* To simulate thickness, multiple stacked divs could be used, but box-shadow is cheaper */
+.passport-page-content {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+.passport-page-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* ─── PASSPORT COVER ─── */
+.passport-cover-ui {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px 22px 22px 14px;
+  box-shadow: 
+    8px 12px 30px rgba(0, 0, 0, 0.7),
+    inset -2px 0 4px rgba(255, 255, 255, 0.05),
+    inset 2px 0 6px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  cursor: pointer;
+}
+
+.passport-cover-emboss-text {
+  font-family: var(--pp-font-editorial);
+  color: var(--pp-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  /* Embossed gold effect */
+  text-shadow: 
+    -1px -1px 1px rgba(255, 255, 255, 0.1),
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    inset 0px 1px 0px rgba(255, 255, 255, 0.2);
+}
+
+.passport-cover-title {
+  font-family: var(--pp-font-display);
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin: 16px 0 32px 0;
+}
+
+.passport-cover-globe {
+  width: 90px;
+  height: 90px;
+  margin: 20px 0;
+  opacity: 0.85;
+}
+.passport-cover-globe svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--pp-gold);
+  stroke-width: 1.5;
+  filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.6));
+}
+
+/* ─── TYPOGRAPHY UTILITIES ─── */
+.pp-h1 { font-family: var(--pp-font-display); font-size: 2.5rem; font-weight: 700; color: var(--pp-ink-black); line-height: 1.1; margin-bottom: 8px; }
+.pp-h2 { font-family: var(--pp-font-editorial); font-size: 1.8rem; font-weight: 600; font-style: italic; color: var(--pp-ink-muted); }
+.pp-h3 { font-family: var(--pp-font-sans); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; font-weight: 700; color: var(--pp-ink-muted); margin-bottom: 4px; }
+.pp-body { font-family: var(--pp-font-editorial); font-size: 1.15rem; line-height: 1.7; color: var(--pp-ink-muted); }
+.pp-meta { font-family: var(--pp-font-sans); font-size: 0.85rem; color: var(--pp-ink-muted); display: flex; align-items: center; gap: 6px; }
+
+/* ─── BLEED IMAGE & OVERLAY ─── */
+.pp-bleed-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.95;
+  border-radius: 12px 0 0 12px;
+}
+.pp-bleed-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── SPECIFIC ELEMENTS ─── */
+
+/* Travel Stamp (Red ink, slightly faded) */
+.pp-stamp {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  border: 4px solid var(--pp-stamp-red);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--pp-stamp-red);
+  font-family: var(--pp-font-sans);
+  text-transform: uppercase;
+  mix-blend-mode: multiply; /* Blends realistic ink with paper */
+  opacity: 0.85;
+  /* Faded ink trick via SVG mask or dashed borders */
+  mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='2' result='n'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 3 -1' in='n' result='m'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='white'/%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' mix-blend-mode='multiply' opacity='0.3'/%3E%3C/svg%3E");
+}
+
+/* Tape Note (Masking Tape & Handwriting) */
+.pp-tape-note {
+  position: relative;
+  margin-top: 40px;
+  transform: rotate(-2deg);
+}
+
+.pp-tape {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 50px;
+  height: 18px;
+  background: rgba(230, 222, 190, 0.65);
+  backdrop-filter: blur(2px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 1px;
+}
+
+.pp-handwriting {
+  font-family: var(--pp-font-handwriting);
+  font-size: 1.6rem;
+  color: #2c2925;
+  line-height: 1.4;
+}
+
+/* Full Bleed Image (Left Page) */
+.pp-bleed-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px 0 0 12px;
+  /* Vintage film treatment */
+  filter: sepia(0.2) contrast(1.1) brightness(0.9);
+}
+.pp-bleed-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0) 60%, rgba(0,0,0,0.6) 100%);
+  border-radius: inherit;
+}
+
+/* ─── NAVIGATION ─── */
+.passport-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 40px;
+  z-index: 100;
+  font-family: var(--pp-font-sans);
+}
+
+.passport-nav-back {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+.passport-nav-back:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.passport-nav-dots {
+  display: flex;
+  gap: 8px;
+}
+.passport-nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.passport-nav-dot.active {
+  width: 24px;
+  border-radius: 3px;
+  background: var(--pp-gold);
+}
+
+.passport-nav-arrows {
+  display: flex;
+  gap: 8px;
+}
+.passport-nav-arrow {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.8rem;
+}
+.passport-nav-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+.passport-nav-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ─── COMPONENT LAYOUT SYSTEMS (DESKTOP DEFAULT) ─── */
+.pp-identity-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  position: relative;
+}
+.pp-identity-belong {
+  margin-bottom: 12px;
+}
+.pp-identity-name {
+  font-size: 2.8rem;
+  margin-bottom: 60px;
+}
+.pp-identity-label {
+  font-size: 0.65rem;
+}
+.pp-identity-date {
+  font-style: italic;
+  margin-bottom: 80px;
+}
+.pp-identity-quote {
+  font-style: italic;
+  max-width: 200px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+.pp-identity-mountains {
+  position: absolute;
+  bottom: 20px;
+  width: 80%;
+  opacity: 0.15;
+  mix-blend-mode: multiply;
+}
+
+.pp-identity-right {
+  padding: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  gap: 40px;
+}
+.pp-stat-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.pp-stat-icon {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+.pp-stat-val {
+  margin: 0;
+}
+.pp-personality-section {
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+.pp-personality-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.pp-personality-emoji {
+  font-size: 1.5rem;
+}
+.pp-personality-title {
+  font-size: 1.8rem;
+  margin: 0;
+}
+.pp-personality-desc {
+  font-style: italic;
+  font-size: 1rem;
+  max-width: 80%;
+}
+
+.pp-memory-right {
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.pp-memory-title {
+  margin-bottom: 8px;
+}
+.pp-memory-date {
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+.pp-memory-meta {
+  margin-bottom: 32px;
+}
+.pp-memory-section {
+  margin-bottom: 20px;
+}
+.pp-memory-val {
+  font-size: 1rem;
+}
+.pp-memory-capsule-sec {
+  flex: 1;
+}
+
+.pp-timeline-left {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px 0px 20px 20px;
+}
+.pp-timeline-hdr {
+  margin-bottom: 40px;
+}
+.pp-timeline-list-container {
+  position: relative;
+  flex: 1;
+}
+.pp-timeline-spine {
+  position: absolute;
+  left: 23px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--pp-ink-faint);
+}
+.pp-timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 40px;
+  position: relative;
+}
+.pp-timeline-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--pp-paper-base);
+  z-index: 2;
+  background: var(--pp-ink-muted);
+}
+.pp-timeline-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pp-timeline-content {
+  padding-top: 4px;
+}
+.pp-timeline-meta-row {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+}
+.pp-timeline-year {
+  font-size: 1rem;
+  margin: 0;
+}
+.pp-timeline-dest {
+  color: var(--pp-ink-black);
+  font-weight: 600;
+}
+.pp-timeline-month {
+  font-size: 0.85rem;
+}
+.pp-timeline-stamp-bg {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  opacity: 0.2;
+  mix-blend-mode: multiply;
+}
+.pp-timeline-stamp-circle {
+  width: 120px;
+  height: 120px;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  transform: rotate(-15deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-reflection-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+.pp-reflection-hdr {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 60px;
+}
+.pp-reflection-title {
+  font-size: 2.5rem;
+  max-width: 300px;
+  line-height: 1.2;
+}
+.pp-reflection-stats {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+  margin-bottom: 40px;
+}
+.pp-reflection-stat-item {
+  /* centered text */
+}
+.pp-reflection-stat-val {
+  font-size: 1.8rem;
+  margin: 0;
+}
+.pp-reflection-quote {
+  font-style: italic;
+  max-width: 280px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.pp-reflection-polaroid {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 220px;
+  background: #fdfcf8;
+  padding: 12px 12px 40px;
+  box-shadow: 2px 4px 16px rgba(0,0,0,0.15);
+  transform: rotate(4deg);
+}
+.pp-reflection-polaroid img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  filter: sepia(0.3) contrast(1.1);
+}
+.pp-polaroid-placeholder {
+  width: 100%;
+  height: 160px;
+  background: #d1cbbd;
+}
+.pp-polaroid-caption {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
+  font-size: 1.4rem;
+}
+.pp-reflection-plan-link {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+.pp-reflection-plan-link a {
+  text-decoration: none;
+  color: var(--pp-ink-black);
+  border-bottom: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding-bottom: 2px;
+}
+
+/* ─── FLOATING SIDE NAVIGATION ─── */
+.pp-side-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 4rem;
+  font-family: var(--pp-font-sans);
+  cursor: pointer;
+  z-index: 100;
+  padding: 20px;
+  transition: all 0.3s;
+}
+.pp-side-nav:hover:not(:disabled) {
+  color: var(--pp-gold);
+  transform: translateY(-50%) scale(1.1);
+}
+.pp-side-nav:disabled {
+  opacity: 0.1;
+  cursor: default;
+}
+.pp-side-nav-left {
+  left: 2%;
+}
+.pp-side-nav-right {
+  right: 2%;
+}
+
+/* ─── MOBILE ADAPTATION ─── */
+@media (max-width: 900px) {
+  .passport-book-wrapper {
+    width: var(--pp-book-width-mobile);
+    height: var(--pp-book-height-mobile);
+  }
+  
+  .passport-page {
+    width: 100%; /* Single page fills container */
+    border-radius: 10px;
+  }
+  
+  .passport-page.left,
+  .passport-page.right {
+    left: 0;
+    right: 0;
+    border-radius: 12px;
+  }
+
+  .pp-spine-shadow-left,
+  .pp-spine-shadow-right {
+    box-shadow: inset 30px 0 50px -20px rgba(74, 55, 38, 0.4);
+    /* Shadow moves to the left edge exclusively on mobile */
+  }
+
+  .passport-page-content {
+    padding: 24px 16px;
+  }
+
+  .pp-h1 { font-size: 2rem; }
+  .pp-h2 { font-size: 1.4rem; }
+  .passport-cover-title { font-size: 2.6rem; }
+  .pp-stamp { transform: scale(0.7); }
+
+  /* Mobile Specific Layout Overrides */
+  .pp-identity-belong {
+    margin-bottom: 6px;
+  }
+  .pp-identity-name {
+    font-size: 2.2rem !important;
+    margin-bottom: 30px !important;
+  }
+  .pp-identity-date {
+    margin-bottom: 40px !important;
+  }
+  .pp-identity-mountains {
+    width: 60%;
+    bottom: 10px;
+  }
+
+  .pp-identity-right {
+    padding: 10px 15px !important;
+    gap: 20px !important;
+  }
+  .pp-stat-row {
+    gap: 15px !important;
+  }
+  .pp-stat-icon {
+    font-size: 1.6rem !important;
+  }
+  .pp-personality-section {
+    margin-top: 20px !important;
+    padding-top: 20px !important;
+  }
+  .pp-personality-title {
+    font-size: 1.4rem !important;
+  }
+  .pp-personality-desc {
+    max-width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+
+  .pp-memory-right {
+    padding: 5px 10px !important;
+  }
+  .pp-memory-meta {
+    margin-bottom: 16px !important;
+  }
+  .pp-memory-section {
+    margin-bottom: 12px !important;
+  }
+  .pp-memory-val {
+    font-size: 0.95rem !important;
+  }
+
+  .pp-timeline-left {
+    padding: 10px !important;
+  }
+  .pp-timeline-hdr {
+    margin-bottom: 20px !important;
+  }
+  .pp-timeline-item {
+    margin-bottom: 20px !important;
+    gap: 16px !important;
+  }
+  .pp-timeline-circle {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .pp-timeline-year {
+    font-size: 0.9rem !important;
+  }
+  .pp-timeline-dest {
+    font-size: 0.95rem !important;
+  }
+
+  .pp-reflection-right {
+    padding: 10px !important;
+  }
+  .pp-reflection-hdr {
+    margin-bottom: 20px !important;
+  }
+  .pp-reflection-title {
+    font-size: 1.8rem !important;
+    margin-bottom: 10px !important;
+  }
+  .pp-reflection-stats {
+    margin-top: 15px !important;
+    margin-bottom: 20px !important;
+    gap: 20px !important;
+  }
+  .pp-reflection-stat-val {
+    font-size: 1.4rem !important;
+  }
+  .pp-reflection-quote {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+    margin-bottom: 20px !important;
+  }
+  .pp-reflection-polaroid {
+    position: relative !important;
+    bottom: auto !important;
+    right: auto !important;
+    margin: 20px auto 40px auto !important;
+    width: 170px !important;
+    padding-bottom: 30px !important;
+  }
+  .pp-reflection-polaroid img {
+    height: 120px !important;
+  }
+  .pp-polaroid-placeholder {
+    height: 120px !important;
+  }
+  .pp-polaroid-caption {
+    font-size: 1.1rem !important;
+  }
+  .pp-reflection-plan-link {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin-top: 20px !important;
+  }
+}
+
+/* ─── ACCESSIBILITY & PREFERENCES ─── */
+@media (prefers-reduced-motion: reduce) {
+  .passport-book-wrapper {
+    transition: none !important;
+  }
+}

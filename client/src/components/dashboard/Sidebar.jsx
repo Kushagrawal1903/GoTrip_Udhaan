@@ -9,6 +9,7 @@ const NAV_GROUPS = [
             { to: '/dashboard', icon: '📊', label: 'Dashboard' },
             { to: '/plan', icon: '✨', label: 'New Trip' },
             { to: '/dashboard/trips', icon: '🗺️', label: 'My Trips' },
+            { to: '/passport', icon: '✈️', label: 'My Passport' },
             { to: '/dashboard/explore', icon: '🧭', label: 'Explore' },
         ],
     },

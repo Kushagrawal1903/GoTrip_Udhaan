@@ -23,6 +23,7 @@ const Exports = lazy(() => import('./pages/dashboard/Exports'));
 const Explore = lazy(() => import('./pages/dashboard/Explore'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Settings = lazy(() => import('./pages/Settings'));
+const PassportPage = lazy(() => import('./pages/PassportPage'));
 
 /**
  * ProtectedRoute — redirects to login if not authenticated
@@ -95,12 +96,22 @@ export default function App() {
         <Route path="settings" element={<Settings />} />
       </Route>
 
-      {/* ─── Trip Wizard — full-screen immersive route (no Navbar/Footer) ─── */}
+      {/* ─── Trip Wizard & Passport — full-screen immersive route (no Navbar/Footer) ─── */}
       <Route
         path="/plan"
         element={
           <ProtectedRoute>
             <PlanTrip />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/passport"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<div className="loading-dots"><span /><span /><span /></div>}>
+                <PassportPage />
+            </Suspense>
           </ProtectedRoute>
         }
       />
