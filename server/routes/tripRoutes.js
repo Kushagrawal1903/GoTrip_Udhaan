@@ -402,4 +402,227 @@ router.get('/:tripId/public', async (req, res, next) => {
     }
 });
 
+/**
+ * POST /api/trips/:id/map-data
+ * Extract all places from trip data, geocode them, and return normalized map locations.
+ * Caches geocoded coordinates in trip.tripData._mapCache to avoid repeated lookups.
+ * Protected route — owner or accepted collaborator.
+ */
+router.post('/:id/map-data', auth, async (req, res, next) => {
+    try {
+        const { batchGeocode } = require('../services/geocodeService');
+
+        const trip = await Trip.findOne({
+            _id: req.params.id,
+            $or: [
+                { userId: req.userId },
+                { 'collaborators.userId': req.userId, 'collaborators.status': 'accepted' },
+            ],
+        });
+
+        if (!trip) {
+            return res.status(404).json({
+                success: false,
+                message: 'Trip not found.',
+            });
+        }
+
+        const tripData = trip.tripData;
+        if (!tripData) {
+            return res.json({ success: true, data: { locations: [] } });
+        }
+
+        // ── Extract all places from trip data ─────────────────────
+        const places = [];
+        let orderCounter = 0;
+
+        // Hotels
+        if (tripData.hotels && Array.isArray(tripData.hotels)) {
+            tripData.hotels.forEach((hotel, idx) => {
+                if (hotel.name) {
+                    places.push({
+                        id: `hotel-${idx}`,
+                        name: hotel.name,
+                        type: 'hotel',
+                        day: 0, // hotels span entire trip
+                        order: orderCounter++,
+                        timeSlot: 'All Day',
+                        description: hotel.description || '',
+                        estimatedCost: hotel.priceRange || '',
+                        mapsLink: hotel.mapsLink || '',
+                        category: 'stay',
+                        source: 'hotel',
+                        rating: hotel.rating || null,
+                    });
+                }
+            });
+        }
+
+        // Itinerary activities
+        if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
+            tripData.itinerary.forEach((day, dayIdx) => {
+                if (day.activities && Array.isArray(day.activities)) {
+                    day.activities.forEach((act, actIdx) => {
+                        if (act.placeName) {
+                            // Determine type from activity context
+                            const actType = classifyActivity(act.placeName, act.activity || '', act.time || '');
+                            places.push({
+                                id: `act-${dayIdx}-${actIdx}`,
+                                name: act.placeName,
+                                type: actType,
+                                day: dayIdx + 1,
+                                order: orderCounter++,
+                                timeSlot: act.time || '',
+                                description: act.activity || '',
+                                estimatedCost: act.estimatedCost || '',
+                                mapsLink: act.mapsLink || '',
+                                category: actType,
+                                source: 'activity',
+                            });
+                        }
+                    });
+                }
+
+                // Meals — extract restaurant names
+                if (day.meals) {
+                    Object.entries(day.meals).forEach(([mealType, detail], mealIdx) => {
+                        if (detail && typeof detail === 'string') {
+                            // Format: "Restaurant Name — ₹XXX per person"
+                            const restaurantName = detail.split('—')[0].split('–')[0].split('-')[0].trim();
+                            if (restaurantName && restaurantName.length > 2) {
+                                places.push({
+                                    id: `meal-${dayIdx}-${mealIdx}`,
+                                    name: restaurantName,
+                                    type: 'restaurant',
+                                    day: dayIdx + 1,
+                                    order: orderCounter++,
+                                    timeSlot: mealType.charAt(0).toUpperCase() + mealType.slice(1),
+                                    description: detail,
+                                    estimatedCost: '',
+                                    mapsLink: '',
+                                    category: 'food',
+                                    source: 'meal',
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        if (places.length === 0) {
+            console.log('[MAP-DATA] No places extracted from trip', req.params.id);
+            return res.json({ success: true, data: { locations: [] } });
+        }
+
+        console.log(`[MAP-DATA] Trip ${req.params.id} (${trip.destination}): extracted ${places.length} places`);
+
+        // ── Check cache ───────────────────────────────────────────
+        const existingCache = tripData._mapCache || {};
+        const uncachedPlaces = places.filter(p => !existingCache[p.id]);
+
+        let geocodedCoords = { ...existingCache };
+
+        // Helper: check if coordinates object has valid numeric lat/lng
+        const hasValidCoords = (c) => c && typeof c.lat === 'number' && typeof c.lng === 'number' && !isNaN(c.lat) && !isNaN(c.lng);
+
+        console.log(`[MAP-DATA] Cache: ${Object.keys(existingCache).length} entries, ${uncachedPlaces.length} uncached`);
+
+        // Only geocode uncached places
+        if (uncachedPlaces.length > 0) {
+            // trip.coordinates is a Mongoose subdocument { lat: null, lng: null }
+            // which is truthy even when empty — must check actual values
+            let destCoords = hasValidCoords(trip.coordinates) ? { lat: trip.coordinates.lat, lng: trip.coordinates.lng } : null;
+
+            console.log(`[MAP-DATA] trip.coordinates valid? ${!!destCoords}`, destCoords);
+
+            if (!destCoords && trip.destination) {
+                const { geocodePlace } = require('../services/geocodeService');
+                destCoords = await geocodePlace(trip.destination, '');
+                console.log(`[MAP-DATA] Geocoded destination "${trip.destination}":`, destCoords);
+                
+                // If we found destination coords, save them to the trip to avoid future lookups
+                if (destCoords) {
+                    trip.coordinates = destCoords;
+                }
+            }
+
+            console.log(`[MAP-DATA] Starting batchGeocode for ${uncachedPlaces.length} places with destCoords:`, destCoords);
+
+            const newCoords = await batchGeocode(
+                uncachedPlaces.map(p => ({ name: p.name, id: p.id })),
+                trip.destination,
+                destCoords
+            );
+
+            console.log(`[MAP-DATA] batchGeocode returned ${Object.keys(newCoords).length} results`);
+
+            geocodedCoords = { ...geocodedCoords, ...newCoords };
+
+            // Save cache to trip document
+            trip.tripData._mapCache = geocodedCoords;
+            trip.markModified('tripData');
+            await trip.save();
+        }
+
+        // ── Build normalized locations ────────────────────────────
+        const locations = places
+            .map(place => {
+                const coords = geocodedCoords[place.id];
+                if (!coords || !hasValidCoords(coords)) return null;
+
+                return {
+                    ...place,
+                    lat: coords.lat,
+                    lng: coords.lng,
+                };
+            })
+            .filter(Boolean);
+
+        console.log(`[MAP-DATA] Final: ${locations.length}/${places.length} locations with valid coordinates`);
+
+        // Build a valid center for the response
+        const tripCenter = hasValidCoords(trip.coordinates)
+            ? { lat: trip.coordinates.lat, lng: trip.coordinates.lng }
+            : (locations.length > 0 ? { lat: locations[0].lat, lng: locations[0].lng } : null);
+
+        res.json({
+            success: true,
+            data: {
+                locations,
+                center: tripCenter,
+                destination: trip.destination,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * Classify an activity into a map marker type based on keywords.
+ * @param {string} placeName
+ * @param {string} description
+ * @param {string} timeSlot
+ * @returns {string}
+ */
+function classifyActivity(placeName, description, timeSlot) {
+    const combined = `${placeName} ${description}`.toLowerCase();
+
+    // Food/Restaurant indicators
+    if (/restaurant|cafe|coffee|dining|eat|food|bakery|bistro|dhaba|street food|cuisine/i.test(combined)) {
+        return 'restaurant';
+    }
+    // Transport indicators
+    if (/airport|station|terminal|metro|bus stand|railway|junction/i.test(combined)) {
+        return 'transport';
+    }
+    // Shopping indicators
+    if (/mall|market|bazaar|shopping|souvenir|store|shop/i.test(combined)) {
+        return 'shopping';
+    }
+    // Default to attraction
+    return 'attraction';
+}
+
 module.exports = router;

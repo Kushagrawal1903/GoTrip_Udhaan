@@ -6,6 +6,7 @@ import PackingList from '../components/PackingList';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import StoryHero from '../components/story/StoryHero';
+import TripMap from '../components/map/TripMap';
 import '../styles/story.css';
 
 /**
@@ -119,12 +120,23 @@ export default function PublicTripResult() {
                 </Link>
             </div>
 
-            {/* Trip Content */}
             <ItineraryView
                 tripData={trip.tripData}
                 placeDetails={placeDetails}
             />
+        </div> {/* End of first animated section */}
 
+        {/* Interactive Travel Map Section (At root level to allow position: fixed for fullscreen) */}
+        <div style={{ padding: '0 24px' }}>
+            <TripMap 
+                tripId={trip._id} 
+                tripData={trip.tripData} 
+                totalDays={trip.duration} 
+            />
+        </div>
+
+        {/* Second animated section */}
+        <div className="animate-fade-in-up" style={{ padding: '0 24px 40px' }}>
             {/* Packing List Section (Read Only) */}
             {packingList.categories && packingList.categories.length > 0 && (
                 <div style={{ maxWidth: 1000, margin: '0 auto' }}>

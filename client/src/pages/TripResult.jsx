@@ -16,6 +16,7 @@ import useTripEmail from '../hooks/useTripEmail';
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
 import StoryHero from '../components/story/StoryHero';
+import TripMap from '../components/map/TripMap';
 import '../styles/story.css';
 
 /**
@@ -605,7 +606,6 @@ export default function TripResult() {
                 </div>
             </div>
 
-            {/* Trip Content */}
             <ItineraryView
                 tripData={trip.tripData}
                 placeDetails={placeDetails}
@@ -619,8 +619,20 @@ export default function TripResult() {
                 onSaveEdit={handleSave}
                 onEditChange={handleEditChange}
             />
+            </div> {/* End of first animated section */}
 
-            {/* Packing List Section */}
+            {/* Interactive Travel Map Section (At root level to allow position: fixed for fullscreen) */}
+            <div style={{ padding: '0 24px' }}>
+                <TripMap 
+                    tripId={id} 
+                    tripData={trip.tripData} 
+                    totalDays={trip.duration} 
+                />
+            </div>
+
+            {/* Second animated section */}
+            <div className="animate-fade-in-up" style={{ padding: '0 24px 40px' }}>
+                {/* Packing List Section */}
             <div style={{ maxWidth: 1000, margin: '0 auto' }}>
                 <PackingList
                     packingList={packing.packingList}
