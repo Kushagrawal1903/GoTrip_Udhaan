@@ -1,9 +1,24 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import MemoryPhotos from './MemoryPhotos';
+import PersonalThought from './PersonalThought';
+import MoodSelector from './MoodSelector';
+
+function hashRotation(seed) {
+    let hash = 0;
+    const str = String(seed || '');
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return (hash % 20) - 10;
+}
 
 export function MemorySpreadLeft({ trip }) {
     const imageUrl = trip.destinationImage;
     const stampName = (trip.destination || 'Unknown').substring(0, 10);
     const year = new Date(trip.createdAt || Date.now()).getFullYear();
+    const stampRotation = useMemo(() => hashRotation(trip.tripId), [trip.tripId]);
 
     return (
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', borderRadius: '12px 0 0 12px' }} className="pp-memory-left-page">
@@ -16,7 +31,7 @@ export function MemorySpreadLeft({ trip }) {
             
             <motion.div 
                 className="pp-stamp"
-                style={{ top: '60px', right: '40px', transform: `rotate(${Math.random() * -20 - 10}deg)` }}
+                style={{ top: '60px', right: '40px', transform: `rotate(${stampRotation}deg)`, borderColor: trip.stampColor, color: trip.stampColor }}
                 initial={{ scale: 1.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 0.85 }}
                 transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.6 }}
@@ -34,7 +49,7 @@ export function MemorySpreadLeft({ trip }) {
     );
 }
 
-export function MemorySpreadRight({ trip, onUpdateFavorite }) {
+export function MemorySpreadRight({ trip, onUpdateMemory, onUploadPhotos, onDeletePhoto }) {
     const startDate = new Date(trip.createdAt || Date.now());
     const duration = trip.duration || 1;
     const endDate = new Date(startDate);
@@ -53,36 +68,49 @@ export function MemorySpreadRight({ trip, onUpdateFavorite }) {
                 {trip.travelStyle && <span>🎒 {trip.travelStyle}</span>}
             </div>
 
-            {trip.hotel && (
-                <div className="pp-memory-section">
-                    <div className="pp-h3">Hotel</div>
-                    <div className="pp-body pp-memory-val">{trip.hotel}</div>
-                </div>
-            )}
+            <div className="pp-memory-grid">
+                <div className="pp-memory-col">
+                    {trip.hotel && (
+                        <div className="pp-memory-section">
+                            <div className="pp-h3">Hotel</div>
+                            <div className="pp-body pp-memory-val">{trip.hotel}</div>
+                        </div>
+                    )}
 
-            {trip.favoriteExperience && (
-                <div className="pp-memory-section">
-                    <div className="pp-h3">Favorite Experience</div>
-                    <div className="pp-body pp-memory-val">{trip.favoriteExperience}</div>
-                </div>
-            )}
+                    {trip.favoriteExperience && (
+                        <div className="pp-memory-section">
+                            <div className="pp-h3">Favorite Experience</div>
+                            <div className="pp-body pp-memory-val">{trip.favoriteExperience}</div>
+                        </div>
+                    )}
 
-            <div className="pp-memory-section pp-memory-capsule-sec">
-                <div className="pp-h3">Memory Capsule</div>
-                <div className="pp-body pp-memory-val">
-                    {trip.memoryCapsule}
+                    <div className="pp-memory-section pp-memory-capsule-sec">
+                        <div className="pp-h3">Memory Capsule</div>
+                        <div className="pp-body pp-memory-val" style={{ marginBottom: '8px' }}>
+                            {trip.memoryCapsule}
+                        </div>
+                        <MoodSelector 
+                            currentMood={trip.userMood}
+                            defaultMood={trip.memoryMood}
+                            tripId={trip.tripId}
+                            onUpdate={onUpdateMemory}
+                        />
+                    </div>
                 </div>
-            </div>
 
-            <div className="pp-tape-note" onClick={() => {
-                const newNote = prompt("Update your favorite moment:", trip.favoriteMoment || "");
-                if (newNote !== null && onUpdateFavorite) onUpdateFavorite(trip.tripId, newNote);
-            }}>
-                <div className="pp-tape" />
-                <div className="pp-h3" style={{ fontSize: '0.55rem', marginLeft: '10px' }}>Favorite Moment</div>
-                <div className="pp-handwriting" style={{ padding: '0 20px 20px' }}>
-                    {trip.favoriteMoment || "A memory waiting to be written..."}
-                    <span style={{ color: 'var(--pp-stamp-red)', marginLeft: '8px', opacity: 0.6 }}>♡</span>
+                <div className="pp-memory-col">
+                    <PersonalThought 
+                        thought={trip.personalThought} 
+                        tripId={trip.tripId} 
+                        onUpdate={onUpdateMemory}
+                    />
+
+                    <MemoryPhotos 
+                        photos={trip.photos || []}
+                        tripId={trip.tripId}
+                        onUpload={onUploadPhotos}
+                        onDelete={onDeletePhoto}
+                    />
                 </div>
             </div>
         </div>

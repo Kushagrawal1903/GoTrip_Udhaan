@@ -8,16 +8,21 @@ import { IdentitySpreadLeft, IdentitySpreadRight } from '../components/passport/
 import { MemorySpreadLeft, MemorySpreadRight } from '../components/passport/MemorySpread';
 import { TimelineSpreadLeft, ReflectionSpreadRight } from '../components/passport/TimelineSpread';
 import PassportNav from '../components/passport/PassportNav';
+import TravelBookLoading from '../components/passport/TravelBookLoading';
 
 import '../styles/passport.css';
 
 export default function PassportPage() {
     const { user } = useAuth();
-    const { data, loading, generating, error, generatePassport, updateFavoriteMoment } = usePassport();
+    const { 
+        data, loading, generating, error, generatePassport, 
+        updateMemoryDetails, uploadPhotos, deletePhoto, downloadTravelBook 
+    } = usePassport();
     
     // -1 = Cover, 0 = Identity (Left/Right), 2 = First Memory (Left/Right), etc.
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     // ALL HOOKS MUST BE BEFORE ANY EARLY RETURNS
     const touchStartX = useRef(null);
@@ -39,6 +44,17 @@ export default function PassportPage() {
         }
     }, [loading, data, generating, error, generatePassport]);
 
+    const handleDownload = async () => {
+        setIsDownloading(true);
+        try {
+            await downloadTravelBook();
+        } catch (err) {
+            alert(err.message || 'Could not save your memory journal. Please try again.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     // Assemble pages (memoized so it doesn't re-create on every render)
     const pages = useMemo(() => {
         if (!data?.trips || data.trips.length === 0) return [];
@@ -51,16 +67,24 @@ export default function PassportPage() {
         // Memory Spreads (2 pages per trip)
         data.trips.forEach((trip, i) => {
             p.push(<MemorySpreadLeft key={`mem-l-${i}`} trip={trip} />);
-            p.push(<MemorySpreadRight key={`mem-r-${i}`} trip={trip} onUpdateFavorite={updateFavoriteMoment} />);
+            p.push(
+                <MemorySpreadRight 
+                    key={`mem-r-${i}`} 
+                    trip={trip} 
+                    onUpdateMemory={updateMemoryDetails}
+                    onUploadPhotos={uploadPhotos}
+                    onDeletePhoto={deletePhoto}
+                />
+            );
         });
 
         // Timeline & Reflection Spread (Last 2 pages)
         p.push(<TimelineSpreadLeft key="tl" trips={data.trips} />);
         const latestImage = data.trips.find(t => t.destinationImage)?.destinationImage;
-        p.push(<ReflectionSpreadRight key="ref" stats={data?.stats} latestImage={latestImage} />);
+        p.push(<ReflectionSpreadRight key="ref" stats={data?.stats} latestImage={latestImage} reflectionSummary={data?.reflectionSummary} />);
 
         return p;
-    }, [data, updateFavoriteMoment]);
+    }, [data, updateMemoryDetails, uploadPhotos, deletePhoto]);
 
     const totalSpreads = Math.ceil(pages.length / 2);
     const totalMobilePages = pages.length;
@@ -103,6 +127,9 @@ export default function PassportPage() {
     // Keyboard navigation
     useEffect(() => {
         const handleKeyDown = (e) => {
+            const tag = e.target?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
+
             if (currentIndex === -1) {
                 if (e.key === 'ArrowRight' || e.key === 'Enter') setCurrentIndex(0);
                 return;
@@ -172,6 +199,10 @@ export default function PassportPage() {
     // ─── MAIN PASSPORT EXPERIENCE ─────────────────────────────
     return (
         <div className="passport-environment" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+            <AnimatePresence>
+                {isDownloading && <TravelBookLoading />}
+            </AnimatePresence>
+
             {/* Background ambient lighting */}
             <div className="passport-desk-element" style={{ top: '10%', left: '10%', width: '300px', height: '300px', borderRadius: '50%', background: 'rgba(255,255,255,0.02)', filter: 'blur(40px)' }} />
             <div className="passport-desk-element" style={{ bottom: '10%', right: '10%', width: '400px', height: '400px', borderRadius: '50%', background: 'rgba(200,150,100,0.03)', filter: 'blur(60px)' }} />
@@ -183,7 +214,9 @@ export default function PassportPage() {
                             currentPage={isMobile ? currentIndex : Math.floor(currentIndex / 2)} 
                             totalPages={isMobile ? totalMobilePages : totalSpreads} 
                             onPrev={handlePrev} 
-                            onNext={handleNext} 
+                            onNext={handleNext}
+                            onDownload={handleDownload}
+                            isDownloading={isDownloading} 
                         />
                     </motion.div>
                 )}

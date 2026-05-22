@@ -1,13 +1,29 @@
 import { useNavigate } from 'react-router-dom';
 
-export default function PassportNav({ currentPage, totalPages, onPrev, onNext }) {
+export default function PassportNav({ currentPage, totalPages, onPrev, onNext, onDownload, isDownloading }) {
     const navigate = useNavigate();
 
     return (
         <div className="passport-nav">
-            <button className="passport-nav-back" onClick={() => navigate('/dashboard')}>
-                ← Back to Dashboard
-            </button>
+            <div style={{ display: 'flex', gap: '16px' }}>
+                <button className="passport-nav-back" onClick={() => navigate('/dashboard')}>
+                    ← Back to Dashboard
+                </button>
+                {onDownload && (
+                    <button 
+                        className="passport-nav-back pp-download-btn" 
+                        onClick={onDownload}
+                        disabled={isDownloading}
+                        style={{ 
+                            borderColor: 'var(--pp-gold)', 
+                            color: 'var(--pp-gold)',
+                            opacity: isDownloading ? 0.5 : 1
+                        }}
+                    >
+                        {isDownloading ? 'Preserving...' : '↓ Save Memory Journal'}
+                    </button>
+                )}
+            </div>
 
             <div className="passport-nav-dots">
                 {Array.from({ length: totalPages }).map((_, i) => (

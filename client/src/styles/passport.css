@@ -169,6 +169,34 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* Edge-only page turn zones (desktop) — avoids stealing clicks from interactive content */
+.passport-page-turn-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14%;
+  z-index: 5;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.passport-page-turn-zone--prev {
+  left: 0;
+  cursor: w-resize;
+}
+
+.passport-page-turn-zone--next {
+  right: 0;
+  cursor: e-resize;
+}
+
+.passport-page-turn-zone:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
 /* ─── PASSPORT COVER ─── */
 .passport-cover-ui {
   position: absolute;
@@ -846,5 +874,384 @@
 @media (prefers-reduced-motion: reduce) {
   .passport-book-wrapper {
     transition: none !important;
+  }
+}
+
+/* ─── MEMORY PHOTOS CLUSTER ─── */
+.pp-memory-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  flex: 1;
+}
+
+.pp-memory-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.pp-photo-upload-btn {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--pp-ink-muted);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.pp-photo-upload-btn:hover {
+  background: rgba(0,0,0,0.05);
+  color: var(--pp-ink-black);
+}
+
+.pp-photo-empty-state {
+  border: 1px dashed rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pp-photo-empty-state:hover {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.3);
+}
+
+.pp-photo-cluster {
+  position: relative;
+  height: 140px;
+  margin-top: 10px;
+}
+
+.pp-photo-item {
+  position: absolute;
+  width: 120px;
+  background: #fff;
+  padding: 6px 6px 20px 6px;
+  box-shadow: 2px 4px 15px rgba(0,0,0,0.12);
+  border-radius: 2px;
+  transform-origin: center;
+}
+
+.pp-photo-item img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  filter: sepia(0.15) contrast(1.05) brightness(0.95);
+}
+
+.pp-photo-tape {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 40px;
+  height: 15px;
+  background: rgba(230, 222, 190, 0.85);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.pp-photo-more-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--pp-ink-black);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Photo Modal */
+.pp-photo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.pp-photo-modal-content {
+  background: var(--pp-paper-base);
+  border-radius: 12px;
+  padding: 30px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.pp-photo-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pp-photo-modal-header h3 {
+  font-family: var(--pp-font-display);
+  margin: 0;
+}
+
+.pp-photo-modal-header button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--pp-ink-muted);
+}
+
+.pp-photo-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.pp-photo-modal-item {
+  position: relative;
+  background: #fff;
+  padding: 10px 10px 40px 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.pp-photo-modal-item img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  filter: sepia(0.1) contrast(1.05);
+}
+
+.pp-photo-delete-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--pp-stamp-red);
+  font-family: var(--pp-font-sans);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* ─── PERSONAL THOUGHT ─── */
+.pp-thought-note {
+  position: relative;
+  background: #fdfcf8;
+  box-shadow: 1px 3px 10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.03);
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-top: 15px;
+  transform: rotate(-1deg);
+  min-height: 100px;
+}
+
+.pp-thought-note.editing {
+  transform: none;
+  z-index: 100;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.pp-thought-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: transparent;
+  border: none;
+  resize: none;
+  padding: 0 20px 10px;
+  font-family: var(--pp-font-handwriting);
+  font-size: 1.6rem;
+  color: #2c2925;
+  line-height: 1.4;
+  outline: none;
+}
+
+.pp-thought-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 20px;
+  border-top: 1px dashed rgba(0,0,0,0.1);
+}
+
+.pp-thought-actions button {
+  background: transparent;
+  border: 1px solid var(--pp-ink-muted);
+  color: var(--pp-ink-muted);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-family: var(--pp-font-sans);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.pp-thought-actions button:last-child {
+  background: var(--pp-ink-muted);
+  color: var(--pp-paper-base);
+}
+
+/* ─── MOOD SELECTOR ─── */
+.pp-mood-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(74, 67, 58, 0.05);
+  border: 1px solid rgba(74, 67, 58, 0.1);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--pp-ink-muted);
+}
+
+.pp-mood-container {
+  overflow: visible;
+}
+
+.pp-mood-selector-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--pp-paper-base);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.pp-mood-selector-popup--portal {
+  position: fixed;
+  margin-top: 0;
+  z-index: 99999;
+}
+
+.pp-thought-error {
+  color: var(--pp-stamp-red, #a44338);
+  font-size: 0.75rem;
+  margin-right: auto;
+}
+
+.pp-mood-option {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.pp-mood-option:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.pp-mood-option.active {
+  background: rgba(0,0,0,0.1);
+  font-weight: bold;
+}
+
+/* ─── TRAVEL BOOK LOADING ─── */
+.pp-travel-book-loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 13, 10, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.pp-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pp-loading-book {
+  width: 60px;
+  height: 40px;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.pp-loading-page {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: var(--pp-paper-base);
+  border-radius: 2px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+}
+
+.pp-loading-page.left {
+  left: 0;
+  transform-origin: right center;
+  border-radius: 4px 0 0 4px;
+}
+
+.pp-loading-page.right {
+  right: 0;
+  transform-origin: left center;
+  border-radius: 0 4px 4px 0;
+}
+
+.pp-loading-bar-container {
+  width: 200px;
+  height: 2px;
+  background: rgba(255,255,255,0.1);
+  margin-top: 30px;
+  overflow: hidden;
+}
+
+.pp-loading-bar {
+  height: 100%;
+  background: var(--pp-gold);
+}
+
+/* Override Download Button hover */
+.pp-download-btn:hover:not(:disabled) {
+  background: var(--pp-gold) !important;
+  color: var(--pp-env-bg) !important;
+}
+
+/* Mobile Adjustments for Grid */
+@media (max-width: 900px) {
+  .pp-memory-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .pp-photo-cluster {
+    margin-bottom: 20px;
   }
 }

@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
@@ -86,15 +85,27 @@ export default function PassportBook({ pages, currentIndex, isMobile, onCoverCli
                                 </div>
                             ) : (
                                 <>
-                                    <div className="passport-page left pp-texture-paper pp-spine-shadow-left" onClick={onPrev} style={{ cursor: 'w-resize' }}>
+                                    <div className="passport-page left pp-texture-paper pp-spine-shadow-left">
                                         <div className="passport-page-content">
                                             {leftPage}
                                         </div>
+                                        <button
+                                            type="button"
+                                            className="passport-page-turn-zone passport-page-turn-zone--prev"
+                                            onClick={onPrev}
+                                            aria-label="Previous page"
+                                        />
                                     </div>
-                                    <div className="passport-page right pp-texture-paper pp-spine-shadow-right" onClick={onNext} style={{ cursor: 'e-resize' }}>
+                                    <div className="passport-page right pp-texture-paper pp-spine-shadow-right">
                                         <div className="passport-page-content">
                                             {rightPage}
                                         </div>
+                                        <button
+                                            type="button"
+                                            className="passport-page-turn-zone passport-page-turn-zone--next"
+                                            onClick={onNext}
+                                            aria-label="Next page"
+                                        />
                                     </div>
                                 </>
                             )}

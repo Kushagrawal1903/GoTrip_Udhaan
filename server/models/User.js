@@ -106,6 +106,22 @@ const userSchema = new mongoose.Schema(
                 isCoreMemory: { type: Boolean, default: false },
                 stampColor: String,
                 generatedAt: Date,
+                // Memory Photos (1-5 per trip)
+                photos: [{
+                    url: String,
+                    publicId: String,
+                    caption: { type: String, maxlength: 100 },
+                    rotation: { type: Number, default: 0 },
+                    uploadedAt: { type: Date, default: Date.now },
+                }],
+                // Personal Thought
+                personalThought: { type: String, maxlength: 1000 },
+                // User-selected mood
+                userMood: {
+                    type: String,
+                    enum: ['peaceful', 'adventurous', 'emotional', 'cultural', 'relaxing', 'energetic', 'reflective', null],
+                    default: null,
+                },
             }],
             reflectionSummary: String,
             generatedAt: Date,

@@ -40,7 +40,7 @@ export function TimelineSpreadLeft({ trips }) {
     );
 }
 
-export function ReflectionSpreadRight({ stats, latestImage }) {
+export function ReflectionSpreadRight({ stats, latestImage, reflectionSummary }) {
     return (
         <div className="pp-reflection-right">
             <div className="pp-h3 pp-reflection-hdr">REFLECTION</div>
@@ -63,7 +63,7 @@ export function ReflectionSpreadRight({ stats, latestImage }) {
             </div>
 
             <div className="pp-body pp-reflection-quote">
-                From quiet mountain mornings to unforgettable city nights, every destination became part of your story.
+                {reflectionSummary || 'From quiet mountain mornings to unforgettable city nights, every destination became part of your story.'}
             </div>
 
             {/* Polaroid attached with tape */}

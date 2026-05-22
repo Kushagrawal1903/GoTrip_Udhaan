@@ -33,6 +33,19 @@ const uploadImageToCloudinary = (buffer, folder = 'gotrip_avatars') => {
 };
 
 /**
+ * Delete an image from Cloudinary using its public_id
+ * @param {string} publicId - Cloudinary public_id (e.g. gotrip_passport_memories/tripId/file)
+ */
+const destroyByPublicId = async (publicId) => {
+    try {
+        if (!publicId) return;
+        await cloudinary.uploader.destroy(publicId);
+    } catch (error) {
+        console.error('Failed to delete image from Cloudinary:', error);
+    }
+};
+
+/**
  * Delete an image from Cloudinary using its URL
  * @param {string} imageUrl - The secure URL of the image
  */
@@ -52,7 +65,40 @@ const deleteImageFromCloudinary = async (imageUrl) => {
     }
 };
 
+/**
+ * Upload a passport memory photo to Cloudinary
+ * Applies warm cinematic treatment and optimized compression
+ * @param {Buffer} buffer - Image buffer
+ * @param {string} tripId - Trip ID for folder organization
+ * @returns {Promise<{url: string, publicId: string}>}
+ */
+const uploadPassportPhoto = (buffer, tripId) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: `gotrip_passport_memories/${tripId}`,
+                transformation: [
+                    { width: 800, height: 600, crop: 'limit' },
+                    { quality: 'auto:good', fetch_format: 'auto' },
+                ],
+            },
+            (error, result) => {
+                if (error) {
+                    return reject(error);
+                }
+                resolve({
+                    url: result.secure_url,
+                    publicId: result.public_id,
+                });
+            }
+        );
+        stream.end(buffer);
+    });
+};
+
 module.exports = {
     uploadImageToCloudinary,
     deleteImageFromCloudinary,
+    destroyByPublicId,
+    uploadPassportPhoto,
 };
