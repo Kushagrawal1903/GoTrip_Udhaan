@@ -31,3 +31,5 @@ Thumbs.db
 # Vercel
 .vercel/
 correction.txt
+.vercel
+.env*

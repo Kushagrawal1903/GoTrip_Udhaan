@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import ItineraryView from '../components/trip/ItineraryView';
 import PackingList from '../components/PackingList';
+import GettingThereSection from '../components/trip/GettingThereSection';
 import { TripSkeleton } from '../components/ui/Skeleton';
 import ErrorAlert from '../components/ui/ErrorAlert';
 import StoryHero from '../components/story/StoryHero';
@@ -120,9 +121,21 @@ export default function PublicTripResult() {
                 </Link>
             </div>
 
+            {trip.hasOrigins && (
+                <div style={{ maxWidth: 1000, margin: '0 auto', marginBottom: 20 }}>
+                    <GettingThereSection
+                        trip={trip}
+                        loading={false}
+                        error={null}
+                        optimizeTravel={undefined}
+                    />
+                </div>
+            )}
+
             <ItineraryView
                 tripData={trip.tripData}
                 placeDetails={placeDetails}
+                meetingPlan={trip.meetingPlan}
             />
         </div> {/* End of first animated section */}
 

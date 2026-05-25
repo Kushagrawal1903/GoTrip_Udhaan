@@ -33,7 +33,7 @@ router.post('/generate', auth, async (req, res, next) => {
         }
 
         // Validate travelers count (default to 1 for backward compatibility)
-        const travelersNum = parseInt(travelers) || 1;
+        const travelersNum = Array.isArray(travelers) ? travelers.length : (parseInt(travelers) || 1);
         if (travelersNum < 1 || travelersNum > 10) {
             return res.status(400).json({
                 success: false,
@@ -66,6 +66,9 @@ router.post('/generate', auth, async (req, res, next) => {
             budget: budget.toLowerCase(),
             travelStyle: travelStyle.toLowerCase(),
             travelers: travelersNum,
+            travelersArray: Array.isArray(travelers) ? travelers : [],
+            hasOrigins: Array.isArray(travelers) && travelers.some(t => t.origin && t.origin.trim().length > 0),
+            optimizeFor: req.body.optimizeFor || 'balanced',
         });
 
         // Fetch place details (coordinates, image) from Google Places API
@@ -99,7 +102,7 @@ router.post('/generate', auth, async (req, res, next) => {
  */
 router.post('/save', auth, async (req, res, next) => {
     try {
-        const { destination, duration, budget, travelStyle, travelers, tripData, destinationImage, coordinates } = req.body;
+        const { destination, duration, budget, travelStyle, travelers, tripData, destinationImage, coordinates, hasOrigins, travelOptimizeFor } = req.body;
 
         if (!destination || !tripData) {
             return res.status(400).json({
@@ -114,10 +117,12 @@ router.post('/save', auth, async (req, res, next) => {
             duration,
             budget,
             travelStyle,
-            travelers: parseInt(travelers) || 1,
+            travelers: Array.isArray(travelers) ? travelers : (parseInt(travelers) || 1),
             tripData,
             destinationImage,
             coordinates,
+            hasOrigins: hasOrigins || false,
+            travelOptimizeFor: travelOptimizeFor || 'balanced'
         });
 
         res.status(201).json({

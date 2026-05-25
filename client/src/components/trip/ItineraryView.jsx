@@ -2,11 +2,12 @@ import { useState } from 'react';
 import DayCard from './DayCard';
 import HotelCard from './HotelCard';
 import BudgetChart from './BudgetChart';
+import Day0Card from './Day0Card';
 
 /**
  * ItineraryView — Full-width trip result display
  */
-export default function ItineraryView({ tripData, placeDetails, onSave, saving, canEdit, editingDay, editValues, isSaving, saveError, onStartEdit, onDiscard, onSaveEdit, onEditChange }) {
+export default function ItineraryView({ tripData, placeDetails, onSave, saving, canEdit, editingDay, editValues, isSaving, saveError, onStartEdit, onDiscard, onSaveEdit, onEditChange, meetingPlan }) {
     const [heroImgFailed, setHeroImgFailed] = useState(false);
 
     if (!tripData) return null;
@@ -170,6 +171,7 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving, 
                             Day-by-Day Itinerary
                         </h3>
                         <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            {meetingPlan && <Day0Card meetingPlan={meetingPlan} />}
                             {tripData.itinerary.map((day, i) => (
                                 <DayCard
                                     key={i}

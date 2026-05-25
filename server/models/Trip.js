@@ -35,11 +35,44 @@ const tripSchema = new mongoose.Schema(
             enum: ['adventure', 'relaxation', 'cultural', 'family', 'romantic'],
         },
         travelers: {
-            type: Number,
+            type: mongoose.Schema.Types.Mixed,
             default: 1,
-            min: [1, 'Must have at least 1 traveler'],
-            max: [10, 'Cannot exceed 10 travelers'],
         },
+        travelRecommendations: [{
+            travelerId: String,
+            travelerName: String,
+            origin: String,
+            destination: String,
+            options: [{
+                mode: { type: String, enum: ['flight', 'train', 'bus', 'car', 'mixed'] },
+                label: String,
+                estimatedCost: String,
+                estimatedDuration: String,
+                recommendation: { type: String, enum: ['fastest', 'cheapest', 'balanced', 'comfort'] },
+                details: String,
+                bookingHint: String
+            }],
+            recommendedOption: String,
+            generatedAt: Date
+        }],
+        meetingPlan: {
+            suggestedArrivalWindow: String,
+            meetPoint: String,
+            meetPointType: { type: String, enum: ['airport', 'station', 'hotel', 'city_center'] },
+            coordinationNotes: String,
+            travelersWithArrivals: [{
+                travelerId: String,
+                travelerName: String,
+                estimatedArrival: String,
+                transportMode: String
+            }]
+        },
+        travelOptimizeFor: {
+            type: String,
+            enum: ['cheapest', 'fastest', 'balanced', 'comfort'],
+            default: 'balanced'
+        },
+        hasOrigins: { type: Boolean, default: false },
         // Store the complete AI-generated trip data as a flexible object
         tripData: {
             type: mongoose.Schema.Types.Mixed,

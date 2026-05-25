@@ -36,6 +36,10 @@ router.get('/:shareId', async (req, res, next) => {
             destinationImage: trip.destinationImage,
             coordinates: trip.coordinates,
             packingList: trip.packingList,
+            meetingPlan: trip.meetingPlan,
+            travelRecommendations: trip.travelRecommendations,
+            hasOrigins: trip.hasOrigins,
+            travelOptimizeFor: trip.travelOptimizeFor,
             createdAt: trip.createdAt,
             // DO NOT include comments or full collaborators list for public view
         };

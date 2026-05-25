@@ -69,7 +69,7 @@ const TripCard = React.memo(function TripCard({ trip, onExportPDF }) {
                 {/* Meta row */}
                 <div style={{ display: 'flex', gap: 12, fontSize: '0.76rem', color: 'var(--text-muted)', marginBottom: 10 }}>
                     <span>📅 {trip.duration} days</span>
-                    <span>👤 {trip.travelers} traveler{trip.travelers > 1 ? 's' : ''}</span>
+                    <span>👤 {Array.isArray(trip.travelers) ? trip.travelers.length : (Number(trip.travelers) || 1)} traveler{(Array.isArray(trip.travelers) ? trip.travelers.length : (Number(trip.travelers) || 1)) > 1 ? 's' : ''}</span>
                 </div>
 
                 {/* Tags */}
@@ -89,6 +89,15 @@ const TripCard = React.memo(function TripCard({ trip, onExportPDF }) {
                             padding: '3px 8px', borderRadius: 5, fontSize: '0.68rem', fontWeight: 600,
                             background: 'rgba(139, 92, 246, 0.08)', color: '#8b5cf6',
                         }}>👥 {trip.collaboratorCount}</span>
+                    )}
+                    {trip.hasOrigins && (
+                        <span style={{
+                            padding: '3px 8px', borderRadius: 5, fontSize: '0.68rem', fontWeight: 700,
+                            background: 'rgba(6, 182, 212, 0.08)', color: '#0891b2',
+                            border: '1px solid rgba(6, 182, 212, 0.2)'
+                        }}>
+                            ✈️ Travel plan included
+                        </span>
                     )}
                 </div>
 

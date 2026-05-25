@@ -47,11 +47,11 @@ const TRAVEL_STYLES = {
  * @param {Object} params - Trip parameters
  * @returns {string} Formatted prompt
  */
-function buildPrompt({ destination, duration, budget, travelStyle, travelers = 1 }) {
+function buildPrompt({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced' }) {
   const budgetInfo = BUDGET_TIERS[budget];
   const styleInfo = TRAVEL_STYLES[travelStyle];
 
-  return `You are a world-class professional travel planner AI. You must generate structured travel itineraries in JSON format.
+  const promptText = `You are a world-class professional travel planner AI. You must generate structured travel itineraries in JSON format.
 
 CRITICAL RULES:
 - BE EXTREMELY BRIEF. Keep descriptions to a maximum of 5-10 words. Use short phrases, NOT full sentences.
@@ -174,6 +174,22 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
 }
 
 REMEMBER: Be extremely brief for activity descriptions (5-10 words). But write rich, sensory prose for narrativeParagraph, wowMoment, and day narratives. Generate content for ALL ${duration} days.`;
+
+  let originSection = '';
+  if (hasOrigins && travelersArray && travelersArray.length > 0) {
+    const travelersWithOrigins = travelersArray.filter(t => t.origin && t.origin.trim());
+    if (travelersWithOrigins.length > 0) {
+      originSection = `
+
+TRAVELER ORIGINS CONTEXT:
+The group travelers are departing from the following cities:
+${travelersWithOrigins.map(t => `- ${t.name} traveling from ${t.origin}`).join('\n')}
+
+Use this context to ensure the itinerary duration, pacing, and arrival pacing are consistent. Do NOT output any travel logistics recommendations or extra text after the JSON object. Output ONLY the JSON block.`;
+    }
+  }
+
+  return promptText + originSection;
 }
 
 /**
@@ -181,13 +197,57 @@ REMEMBER: Be extremely brief for activity descriptions (5-10 words). But write r
  * Handles markdown fences, trailing commas, and truncated output.
  */
 function extractJSON(raw) {
-  // Strip markdown code fences
-  let text = raw.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
+  let text = raw.trim();
 
-  // Find the outermost JSON object
+  // Find the first '{'
   const start = text.indexOf('{');
   if (start === -1) throw new SyntaxError('No JSON object found in response');
-  text = text.slice(start);
+  
+  // Find the matching closing brace '}' using brace balancing
+  let braceCount = 0;
+  let end = -1;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i++) {
+    const char = text[i];
+
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escaped = true;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (!inString) {
+      if (char === '{') {
+        braceCount++;
+      } else if (char === '}') {
+        braceCount--;
+        if (braceCount === 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+  }
+
+  if (end !== -1) {
+    text = text.substring(start, end + 1);
+  } else {
+    text = text.substring(start);
+  }
+
+  // Strip markdown code fences if they got inside (unlikely)
+  text = text.replace(/```json\s*/gi, '').replace(/```\s*/gi, '').trim();
 
   // Try parsing as-is first
   try {
@@ -220,7 +280,7 @@ function extractJSON(raw) {
  * @param {Object} params - Trip input parameters
  * @returns {Object} Parsed trip data as JSON
  */
-async function generateTrip({ destination, duration, budget, travelStyle, travelers = 1 }) {
+async function generateTrip({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced' }) {
   const MAX_RETRIES = 2;
 
   const model = genAI.getGenerativeModel({
@@ -231,7 +291,7 @@ async function generateTrip({ destination, duration, budget, travelStyle, travel
     },
   });
 
-  const prompt = buildPrompt({ destination, duration, budget, travelStyle, travelers });
+  const prompt = buildPrompt({ destination, duration, budget, travelStyle, travelers, travelersArray, hasOrigins, optimizeFor });
 
   let lastError;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {

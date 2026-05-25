@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../layout/ThemeToggle';
+import { useAuth } from '../../context/AuthContext';
+import StepDuration from '../wizard/StepDuration';
 import './TripWizard.css';
 
 /* ─── Constants ──────────────────────────────────────────────── */
@@ -152,110 +154,7 @@ function StepDestination({ destination, onUpdate }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   STEP 2 — Duration + Travelers
-   ═══════════════════════════════════════════════════════════════ */
-function StepDuration({ duration, travelers, onUpdate }) {
-  const activePreset = DURATION_PRESETS.find(p => p.value === duration);
-
-  return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show">
-      <motion.div variants={itemVariants} className="wiz-eyebrow">How long?</motion.div>
-      <motion.h2 variants={itemVariants} className="wiz-headline">Plan your perfect timeline</motion.h2>
-      <motion.p variants={itemVariants} className="wiz-subtext">
-        Drag to set duration, then choose how many are joining.
-      </motion.p>
-
-      {/* Big animated number */}
-      <motion.div variants={itemVariants}>
-        <div style={{ textAlign: 'center' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={duration}
-              className="wiz-big-number"
-              initial={{ opacity: 0, scale: 0.8, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 10 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            >
-              {duration}
-            </motion.div>
-          </AnimatePresence>
-          <div className="wiz-big-number-label">
-            {duration === 1 ? 'Day' : 'Days'}
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Slider */}
-      <motion.div variants={itemVariants}>
-        <input
-          type="range"
-          className="wiz-slider"
-          min="1"
-          max="30"
-          value={duration}
-          onChange={(e) => onUpdate('duration', Number(e.target.value))}
-          style={{
-            background: `linear-gradient(to right, var(--wiz-teal) 0%, var(--wiz-teal) ${((duration - 1) / 29) * 100}%, var(--wiz-surface2) ${((duration - 1) / 29) * 100}%, var(--wiz-surface2) 100%)`,
-          }}
-        />
-      </motion.div>
-
-      {/* Presets */}
-      <motion.div variants={itemVariants} className="wiz-presets">
-        {DURATION_PRESETS.map((preset) => (
-          <button
-            key={preset.value}
-            type="button"
-            className={`wiz-preset-chip${activePreset?.value === preset.value ? ' active' : ''}`}
-            onClick={() => onUpdate('duration', preset.value)}
-          >
-            {preset.label} ({preset.value})
-          </button>
-        ))}
-      </motion.div>
-
-      {/* Travelers */}
-      <motion.div variants={itemVariants} className="wiz-travelers">
-        <div className="wiz-travelers-eyebrow">Who's coming?</div>
-        <div className="wiz-travelers-controls">
-          <button
-            type="button"
-            className="wiz-travelers-btn"
-            disabled={travelers <= 1}
-            onClick={() => onUpdate('travelers', travelers - 1)}
-          >
-            −
-          </button>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={travelers}
-              className="wiz-travelers-count"
-              initial={{ scale: 1.3, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.7, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-            >
-              {travelers}
-            </motion.div>
-          </AnimatePresence>
-          <button
-            type="button"
-            className="wiz-travelers-btn"
-            disabled={travelers >= 10}
-            onClick={() => onUpdate('travelers', travelers + 1)}
-          >
-            +
-          </button>
-        </div>
-        <div className="wiz-travelers-label">
-          {travelers === 1 ? 'Traveler' : 'Travelers'}
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
+// StepDuration is now imported from '../wizard/StepDuration'
 
 /* ═══════════════════════════════════════════════════════════════
    STEP 3 — Travel Style
@@ -390,6 +289,10 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
   const styleName = STYLE_OPTIONS.find(s => s.id === tripData.style)?.name || tripData.style;
   const budgetName = BUDGET_OPTIONS.find(b => b.id === tripData.budget)?.name || tripData.budget;
 
+  const travelersCount = Array.isArray(tripData.travelers) ? tripData.travelers.length : (Number(tripData.travelers) || 1);
+  const travelersWithOrigins = Array.isArray(tripData.travelers) ? tripData.travelers.filter(t => t.origin && t.origin.trim().length > 0) : [];
+  const hasOrigins = travelersWithOrigins.length > 0;
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show">
       <motion.div variants={itemVariants} className="wiz-eyebrow">All set!</motion.div>
@@ -409,7 +312,14 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
         </div>
         <div className="wiz-summary-cell">
           <div className="wiz-summary-label">Travelers</div>
-          <div className="wiz-summary-value">{tripData.travelers} {tripData.travelers === 1 ? 'Person' : 'People'}</div>
+          <div className="wiz-summary-value">
+            {travelersCount} {travelersCount === 1 ? 'Person' : 'People'}
+            {hasOrigins && (
+              <span style={{ fontSize: '0.72rem', display: 'block', opacity: 0.8, marginTop: 2, fontWeight: 500 }}>
+                ({travelersWithOrigins.length} with origins)
+              </span>
+            )}
+          </div>
         </div>
         <div className="wiz-summary-cell">
           <div className="wiz-summary-label">Travel Style</div>
@@ -427,7 +337,7 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
           onClick={onGenerate}
           disabled={loading}
         >
-          ✦ Generate My AI Itinerary
+          {hasOrigins ? '✦ Generate Itinerary + Travel Plan' : '✦ Generate My AI Itinerary'}
         </button>
 
         {error && (
@@ -448,17 +358,42 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
    MAIN WIZARD COMPONENT
    ═══════════════════════════════════════════════════════════════ */
 export default function TripWizard({ onGenerate, loading = false, error = '' }) {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [generationStartTime, setGenerationStartTime] = useState(null);
   const [, forceUpdate] = useState(0);
+  
+  const initialName = user?.name?.split(' ')[0] || 'Creator';
+
   const [tripData, setTripData] = useState({
     destination: '',
     duration: 5,
-    travelers: 2,
+    travelers: [
+      {
+        id: Math.random().toString(36).substring(2, 9),
+        name: initialName,
+        origin: '',
+        role: 'creator'
+      }
+    ],
     style: null,
     budget: null,
   });
+
+  useEffect(() => {
+    if (user?.name) {
+      const firstName = user.name.split(' ')[0];
+      setTripData(prev => {
+        if (prev.travelers.length > 0 && prev.travelers[0].role === 'creator' && prev.travelers[0].name === 'Creator') {
+          const updatedTravelers = [...prev.travelers];
+          updatedTravelers[0] = { ...updatedTravelers[0], name: firstName };
+          return { ...prev, travelers: updatedTravelers };
+        }
+        return prev;
+      });
+    }
+  }, [user]);
 
   const updateTripData = useCallback((field, value) => {
     setTripData(prev => ({ ...prev, [field]: value }));
@@ -467,7 +402,7 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
   const canContinue = () => {
     switch (currentStep) {
       case 0: return tripData.destination.trim().length > 0;
-      case 1: return true; // defaults are valid
+      case 1: return Array.isArray(tripData.travelers) && tripData.travelers.length > 0 && tripData.travelers.every(t => t.name.trim().length > 0);
       case 2: return tripData.style !== null;
       case 3: return tripData.budget !== null;
       case 4: return true;
@@ -537,7 +472,7 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
       case 0:
         return <StepDestination destination={tripData.destination} onUpdate={updateTripData} />;
       case 1:
-        return <StepDuration duration={tripData.duration} travelers={tripData.travelers} onUpdate={updateTripData} />;
+        return <StepDuration duration={tripData.duration} travelers={tripData.travelers} destination={tripData.destination} onUpdate={updateTripData} />;
       case 2:
         return <StepStyle style={tripData.style} onUpdate={updateTripData} />;
       case 3:

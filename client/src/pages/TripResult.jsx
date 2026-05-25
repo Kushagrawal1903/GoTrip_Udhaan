@@ -13,6 +13,8 @@ import usePackingList from '../hooks/usePackingList';
 import useCollaboration from '../hooks/useCollaboration';
 import useSocket from '../hooks/useSocket';
 import useTripEmail from '../hooks/useTripEmail';
+import useTravelRecommendations from '../hooks/useTravelRecommendations';
+import GettingThereSection from '../components/trip/GettingThereSection';
 import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
 
 import StoryHero from '../components/story/StoryHero';
@@ -32,6 +34,13 @@ export default function TripResult() {
     const [exporting, setExporting] = useState(false);
     const [collabOpen, setCollabOpen] = useState(false);
     const [sharePanelOpen, setSharePanelOpen] = useState(false);
+
+    // ─── Travel Recommendations State ────────────────────────
+    const {
+        loading: loadingRecommendations,
+        error: recommendationsError,
+        optimizeTravel
+    } = useTravelRecommendations(id, trip, setTrip);
 
 
     // ─── Itinerary Editing State ─────────────────────────────
@@ -431,6 +440,48 @@ export default function TripResult() {
                     {/* Compact mobile info? No, keep it simple */}
                 </div>
 
+                {trip && Array.isArray(trip.travelers) && (
+                    <div style={{
+                        display: 'flex',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginTop: 14,
+                        marginBottom: 20,
+                        alignItems: 'center'
+                    }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                            Group Travelers:
+                        </span>
+                        {trip.travelers.filter(t => t.name).map((t, idx) => (
+                            <span
+                                key={t.id || idx}
+                                style={{
+                                    padding: '4px 10px',
+                                    background: 'var(--bg-glass)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: 20,
+                                    fontSize: '0.82rem',
+                                    color: 'var(--text-primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 4,
+                                    fontWeight: 600
+                                }}
+                            >
+                                <span>{t.name}</span>
+                                {t.origin && (
+                                    <span style={{ color: 'var(--color-primary)', fontSize: '0.78rem', fontWeight: 700 }}>
+                                        ({t.origin})
+                                    </span>
+                                )}
+                            </span>
+                        ))}
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                            → {trip.destination}
+                        </span>
+                    </div>
+                )}
+
                 <div className="mobile-action-scroll" style={{ 
                     display: 'flex', 
                     gap: 10, 
@@ -606,6 +657,17 @@ export default function TripResult() {
                 </div>
             </div>
 
+            {trip.hasOrigins && (
+                <div style={{ maxWidth: 1000, margin: '0 auto', marginBottom: 20 }}>
+                    <GettingThereSection
+                        trip={trip}
+                        loading={loadingRecommendations}
+                        error={recommendationsError}
+                        optimizeTravel={optimizeTravel}
+                    />
+                </div>
+            )}
+
             <ItineraryView
                 tripData={trip.tripData}
                 placeDetails={placeDetails}
@@ -618,6 +680,7 @@ export default function TripResult() {
                 onDiscard={handleDiscard}
                 onSaveEdit={handleSave}
                 onEditChange={handleEditChange}
+                meetingPlan={trip.meetingPlan}
             />
             </div> {/* End of first animated section */}
 

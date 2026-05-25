@@ -260,23 +260,45 @@ export default function DayCard({
                                             href={mapsLink}
                                             target="_blank"
                                             rel="noopener noreferrer"
+                                            title="Opens in Google Maps"
+                                            className="map-pill-btn"
                                             style={{
                                                 display: 'inline-flex',
                                                 alignItems: 'center',
-                                                gap: 5,
-                                                marginTop: 6,
-                                                padding: '4px 12px',
-                                                borderRadius: 6,
-                                                background: 'rgba(13, 148, 136, 0.08)',
-                                                border: '1px solid rgba(13, 148, 136, 0.15)',
+                                                gap: 6,
+                                                marginTop: 8,
+                                                padding: '5px 12px',
+                                                borderRadius: 20,
+                                                background: 'rgba(99, 102, 241, 0.06)',
+                                                border: '1.5px solid rgba(99, 102, 241, 0.15)',
                                                 color: 'var(--color-primary)',
                                                 fontSize: '0.76rem',
-                                                fontWeight: 600,
+                                                fontWeight: 700,
                                                 textDecoration: 'none',
-                                                transition: 'all 0.2s',
+                                                transition: 'all 0.2s ease',
+                                                cursor: 'pointer',
+                                                boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
+                                                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                                                e.currentTarget.style.transform = 'translateY(-1px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = 'rgba(99, 102, 241, 0.06)';
+                                                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.15)';
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                            }}
+                                            onMouseDown={(e) => {
+                                                e.currentTarget.style.transform = 'scale(0.97)';
+                                            }}
+                                            onMouseUp={(e) => {
+                                                e.currentTarget.style.transform = 'scale(1) translateY(-1px)';
                                             }}
                                         >
-                                            {act.placeName || 'View on Maps'} →
+                                            <i className="ti ti-map-pin" style={{ color: 'var(--wiz-teal)' }} />
+                                            <span>{act.placeName || 'View on Maps'}</span>
+                                            <i className="ti ti-external-link" style={{ fontSize: '0.7rem', opacity: 0.8 }} />
                                         </a>
                                     )}
                                 </div>

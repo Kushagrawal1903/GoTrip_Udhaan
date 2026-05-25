@@ -117,7 +117,7 @@ export const getBudgetDisplay = (budget) => {
 // ─── Traveler Group Label ─────────────────────────────────────────
 
 export const getTravelerLabel = (travelers) => {
-  const n = Number(travelers) || 1;
+  const n = Array.isArray(travelers) ? travelers.length : (Number(travelers) || 1);
   if (n === 1) return 'Solo';
   if (n === 2) return 'Couple';
   if (n <= 4) return `${n} Travelers`;

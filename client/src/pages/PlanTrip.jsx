@@ -28,6 +28,8 @@ export default function PlanTrip() {
                 tripData: res.data.data.tripData,
                 destinationImage: res.data.data.placeDetails?.photoUrl || null,
                 coordinates: res.data.data.placeDetails?.coordinates || null,
+                hasOrigins: Array.isArray(data.travelers) && data.travelers.some(t => t.origin && t.origin.trim().length > 0),
+                travelOptimizeFor: 'balanced',
             });
             
             // Redirect to the trip result page with all features
