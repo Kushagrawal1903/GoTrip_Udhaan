@@ -36,7 +36,7 @@ const IntentSchema = z.object({
 const ChangeSchema = z.object({
     type: z.enum(['replace', 'add', 'remove', 'modify']),
     day: z.number().int().min(1).max(30),
-    slot: z.enum(['morning', 'afternoon', 'evening', 'night', 'meal_breakfast', 'meal_lunch', 'meal_dinner']).optional(),
+    slot: z.string().optional(),
     remove: z.object({
         placeName: z.string().optional(),
         activity: z.string().optional(),
