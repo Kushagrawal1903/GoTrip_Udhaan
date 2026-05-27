@@ -23,6 +23,7 @@ const emailRoutes = require('./routes/email');
 const shareRoutes = require('./routes/shareRoutes');
 const userRoutes = require('./routes/user');
 const travelRecommendationsRoutes = require('./routes/travelRecommendations');
+const companionRoutes = require('./routes/companionRoutes');
 
 // Initialize Express app and HTTP server
 const app = express();
@@ -82,6 +83,10 @@ app.use('/api/auth', authRoutes);
 // Trip routes
 app.use('/api/trips', tripRoutes);
 app.use('/api/trips', travelRecommendationsRoutes);
+
+// AI Companion routes
+app.use('/api/companion', aiLimiter);
+app.use('/api/companion', companionRoutes);
 
 // Packing list routes (Feature 1)
 app.use('/api/packing-list', packingListRoutes);

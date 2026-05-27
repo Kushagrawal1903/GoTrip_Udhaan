@@ -21,6 +21,13 @@ import StoryHero from '../components/story/StoryHero';
 import TripMap from '../components/map/TripMap';
 import '../styles/story.css';
 
+// AI Travel Companion
+import CompanionPanel from '../components/travel-companion/CompanionPanel';
+import MobileCompanionSheet from '../components/travel-companion/MobileCompanionSheet';
+import UndoToast from '../components/travel-companion/UndoToast';
+import useCompanion from '../hooks/useCompanion';
+import { FaCompass } from 'react-icons/fa';
+
 /**
  * TripResult — view a single saved trip with packing list, PDF export, and collaboration
  */
@@ -93,6 +100,9 @@ export default function TripResult() {
 
     // Collaboration hook
     const collab = useCollaboration(id, isOwner);
+
+    // AI Travel Companion hook
+    const companion = useCompanion(id, trip, setTrip);
 
     /**
      * Share on WhatsApp — Click-to-Chat (no API, no modal, no phone input).
@@ -746,8 +756,26 @@ export default function TripResult() {
                 trip={trip}
             />
 
-
         </div>
+
+        {/* AI Travel Companion */}
+        {isOwner && (
+            <>
+                <CompanionPanel companion={companion} trip={trip} isOwner={isOwner} />
+                <MobileCompanionSheet companion={companion} trip={trip} isOwner={isOwner} />
+                <UndoToast companion={companion} />
+                
+                {!companion.isOpen && (
+                    <button 
+                        className="companion-trigger-btn"
+                        onClick={() => companion.setIsOpen(true)}
+                        aria-label="Open Travel Companion"
+                    >
+                        <FaCompass className="trigger-icon-spin" />
+                    </button>
+                )}
+            </>
+        )}
         </>
     );
 }

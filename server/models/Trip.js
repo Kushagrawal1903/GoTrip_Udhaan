@@ -96,7 +96,7 @@ const tripSchema = new mongoose.Schema(
                 icon: String,
                 items: [{
                     name: String,
-                    quantity: Number,
+                    quantity: mongoose.Schema.Types.Mixed,
                     essential: Boolean,
                     note: String,
                     checked: { type: Boolean, default: false },
@@ -224,6 +224,29 @@ const tripSchema = new mongoose.Schema(
             },
 
             publishedAt: Date,
+        },
+
+        // ─── FEATURE: AI Travel Companion ─────────────────────
+        companionSession: {
+            messages: [{
+                role: { type: String, enum: ['user', 'assistant', 'system'] },
+                content: String,
+                intent: String,
+                patchId: String,
+                timestamp: { type: Date, default: Date.now }
+            }],
+            intentHistory: [String],
+            patchHistory: [{
+                patchId: String,
+                intent: String,
+                changes: mongoose.Schema.Types.Mixed,
+                appliedAt: Date,
+                undoneAt: Date,
+                snapshot: mongoose.Schema.Types.Mixed
+            }],
+            userPreferences: mongoose.Schema.Types.Mixed,
+            contextMemory: mongoose.Schema.Types.Mixed,
+            lastActiveAt: Date
         },
 
         // Wishlist/saved stories (for logged-in users who save others' stories)
