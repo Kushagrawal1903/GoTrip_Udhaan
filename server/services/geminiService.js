@@ -91,6 +91,7 @@ DETAILED INSTRUCTIONS:
 9. Write a "narrativeParagraph" — a vivid, editorial 2-3 sentence paragraph (40-60 words) about what makes ${destination} special. Write as a travel writer, with sensory details. NOT generic tourism copy. Example: "Indore does not reveal itself to the passive observer. It demands dirt on your boots and a willingness to navigate midnight crowds for charcoal-roasted street delicacies."
 10. Write a "wowMoment" — the single most unforgettable experience in ${destination}. Include a vivid title, a 2-3 sentence sensory description, and a reflective one-liner about why it matters.
 11. For EACH day in the itinerary, include a "narrative" — a vivid, cinematic 2-sentence description (25-40 words) that paints what the traveler will experience that day. Write in second person ("you"). Example: "Scramble down slick wet rocks of Patalpani, where the air vibrates with the roar of falling water. The evening sun paints the valley a deep, bruised violet."
+12. Write a "mustTryFood" recommendation — the most iconic, must-have local dish in ${destination}. Include the dish name, a short description, the best place/eatery to have it, and a maps link for that place.
 
 OUTPUT FORMAT:
 Respond ONLY with valid JSON. No markdown, no code blocks, no explanations before or after. Just pure JSON in this exact structure:
@@ -102,6 +103,12 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
     "title": "A short evocative title for the must-do experience",
     "description": "A vivid 2-3 sentence sensory description of the experience.",
     "reflection": "A single reflective sentence about why this moment matters."
+  },
+  "mustTryFood": {
+    "dishName": "Name of the local dish (e.g. Chole Kulche)",
+    "description": "Short description of the dish (max 10 words).",
+    "bestPlaceToEat": "Name of the famous/best place to eat this",
+    "mapsLink": "https://www.google.com/maps/search/Restaurant+Name+${encodeURIComponent(destination)}"
   },
   "duration": ${duration},
   "travelers": ${travelers},

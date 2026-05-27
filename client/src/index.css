@@ -111,6 +111,20 @@ a {
   box-shadow: var(--shadow-lg);
 }
 
+/* ─── UTILITIES ──────────────────────────────────────────────── */
+.hover-scale {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-scale:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.hover-scale:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* ─── ANIMATIONS ─────────────────────────────────────────────── */
 @keyframes fadeInUp {
   from {

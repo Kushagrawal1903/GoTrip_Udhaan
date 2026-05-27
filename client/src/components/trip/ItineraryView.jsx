@@ -161,6 +161,104 @@ export default function ItineraryView({ tripData, placeDetails, onSave, saving, 
                     </div>
                 )}
 
+                {/* ─── MUST TRY FOOD ────────────────────────────────── */}
+                {tripData.mustTryFood && (
+                    <div className="glass-card animate-fade-in-up" style={{ padding: '24px 28px', marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 16, borderLeft: '4px solid #f59e0b' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 14, borderBottom: '1px solid var(--border-color)', paddingBottom: 16 }}>
+                            <div style={{ 
+                                width: 48, height: 48, borderRadius: 12, 
+                                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))', 
+                                border: '1px solid rgba(245, 158, 11, 0.3)',
+                                color: '#f59e0b', fontSize: '1.5rem', 
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.1)'
+                            }}>
+                                🍜
+                            </div>
+                            <div>
+                                <h3 style={{ margin: 0, fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                                    Must Try Food
+                                </h3>
+                                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                    The most iconic local flavor in {tripData.destination}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
+                            <div style={{ flex: '1 1 250px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                                    <h4 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>
+                                        {tripData.mustTryFood.dishName}
+                                    </h4>
+                                    <span style={{ 
+                                        padding: '4px 10px', borderRadius: 20, 
+                                        background: 'rgba(245, 158, 11, 0.1)', 
+                                        color: '#f59e0b', fontSize: '0.7rem', 
+                                        fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' 
+                                    }}>
+                                        Local Favorite
+                                    </span>
+                                </div>
+                                <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 20 }}>
+                                    {tripData.mustTryFood.description}
+                                </p>
+                                
+                                <div style={{ 
+                                    background: 'var(--bg-glass)', 
+                                    border: '1px solid var(--border-color)', 
+                                    padding: '14px 18px', 
+                                    borderRadius: 12,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: 12,
+                                    boxShadow: 'var(--shadow-sm)'
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{
+                                            width: 38, height: 38, borderRadius: 10,
+                                            background: 'rgba(13, 148, 136, 0.1)',
+                                            color: 'var(--wiz-teal, #0d9488)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: '1.1rem'
+                                        }}>
+                                            <i className="ti ti-building-store" />
+                                        </div>
+                                        <div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em', marginBottom: 2 }}>
+                                                Best Place to Eat
+                                            </div>
+                                            <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                                {tripData.mustTryFood.bestPlaceToEat}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {tripData.mustTryFood.mapsLink && (
+                                        <a href={tripData.mustTryFood.mapsLink} target="_blank" rel="noopener noreferrer" style={{
+                                            padding: '8px 16px', borderRadius: 8,
+                                            background: 'rgba(99, 102, 241, 0.08)',
+                                            border: '1px solid rgba(99, 102, 241, 0.2)',
+                                            color: '#6366f1',
+                                            display: 'flex', alignItems: 'center', gap: 6,
+                                            textDecoration: 'none',
+                                            fontWeight: 700,
+                                            fontSize: '0.8rem',
+                                            transition: 'all 0.2s',
+                                            flexShrink: 0
+                                        }} 
+                                        className="hover-scale"
+                                        title="View on Google Maps">
+                                            <i className="ti ti-map-pin" style={{ fontSize: '1rem' }} />
+                                            <span>Maps</span>
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* ─── ITINERARY ─────────────────────────────────── */}
                 {tripData.itinerary?.length > 0 && (
                     <div style={{ marginBottom: 28 }}>
