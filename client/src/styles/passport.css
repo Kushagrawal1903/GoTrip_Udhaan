@@ -633,7 +633,7 @@
   margin-bottom: 40px;
 }
 .pp-reflection-stat-item {
-  /* centered text */
+  text-align: center;
 }
 .pp-reflection-stat-val {
   font-size: 1.8rem;
