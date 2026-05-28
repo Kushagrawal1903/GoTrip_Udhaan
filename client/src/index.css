@@ -64,6 +64,7 @@ html {
 }
 
 body {
+  zoom: 0.9;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'DM Sans', 'Inter', system-ui, -apple-system, sans-serif;
@@ -1065,4 +1066,4 @@ a {
     padding: 6px 12px;
     font-size: 0.74rem;
   }
-}
+}
