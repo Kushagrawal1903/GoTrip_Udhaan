@@ -94,7 +94,7 @@ export default function DashboardLayout() {
                 {[
                     { icon: '🏠', label: 'Home', to: '/dashboard' },
                     { icon: '🗺️', label: 'Trips', to: '/dashboard/trips' },
-                    { icon: '✈️', label: 'Passport', to: '/passport', special: true },
+                    { icon: '✨', label: 'New Trip', to: '/plan', special: true },
                     { icon: '👥', label: 'Collab', to: '/dashboard/collaborations' },
                     { icon: '👤', label: 'Menu', action: () => setMobileOpen(true) },
                 ].map(item => {
