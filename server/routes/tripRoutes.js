@@ -13,7 +13,7 @@ const router = express.Router();
  */
 router.post('/generate', auth, async (req, res, next) => {
     try {
-        const { destination, duration, budget, travelStyle, travelers } = req.body;
+        const { destination, duration, budget, travelStyle, travelers, selectedVibes, customTripIntent } = req.body;
 
         // Validate required inputs
         if (!destination || !duration || !budget || !travelStyle) {
@@ -69,6 +69,8 @@ router.post('/generate', auth, async (req, res, next) => {
             travelersArray: Array.isArray(travelers) ? travelers : [],
             hasOrigins: Array.isArray(travelers) && travelers.some(t => t.origin && t.origin.trim().length > 0),
             optimizeFor: req.body.optimizeFor || 'balanced',
+            selectedVibes: Array.isArray(selectedVibes) ? selectedVibes : [],
+            customTripIntent: typeof customTripIntent === 'string' ? customTripIntent.slice(0, 500) : '',
         });
 
         // Fetch place details (coordinates, image) from Google Places API
@@ -102,7 +104,7 @@ router.post('/generate', auth, async (req, res, next) => {
  */
 router.post('/save', auth, async (req, res, next) => {
     try {
-        const { destination, duration, budget, travelStyle, travelers, tripData, destinationImage, coordinates, hasOrigins, travelOptimizeFor } = req.body;
+        const { destination, duration, budget, travelStyle, travelers, tripData, destinationImage, coordinates, hasOrigins, travelOptimizeFor, tripPreferences } = req.body;
 
         if (!destination || !tripData) {
             return res.status(400).json({
@@ -122,7 +124,8 @@ router.post('/save', auth, async (req, res, next) => {
             destinationImage,
             coordinates,
             hasOrigins: hasOrigins || false,
-            travelOptimizeFor: travelOptimizeFor || 'balanced'
+            travelOptimizeFor: travelOptimizeFor || 'balanced',
+            tripPreferences: tripPreferences || {},
         });
 
         res.status(201).json({

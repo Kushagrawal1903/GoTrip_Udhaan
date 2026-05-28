@@ -30,6 +30,10 @@ export default function PlanTrip() {
                 coordinates: res.data.data.placeDetails?.coordinates || null,
                 hasOrigins: Array.isArray(data.travelers) && data.travelers.some(t => t.origin && t.origin.trim().length > 0),
                 travelOptimizeFor: 'balanced',
+                tripPreferences: {
+                    selectedVibes: data.selectedVibes || [],
+                    customTripIntent: data.customTripIntent || '',
+                },
             });
             
             // Redirect to the trip result page with all features

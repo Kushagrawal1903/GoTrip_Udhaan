@@ -43,11 +43,74 @@ const TRAVEL_STYLES = {
 };
 
 /**
+ * Trip Vibe Preference descriptions for prompt engineering.
+ * Each vibe ID maps to AI-friendly guidance that shapes itinerary personality.
+ */
+const VIBE_DESCRIPTIONS = {
+  slow_mornings: 'later morning starts (10AM+), fewer early activities, scenic breakfast spots, slower pacing until noon',
+  relaxed_afternoons: 'unhurried afternoon experiences, scenic leisure spots, optional rest/downtime built in',
+  calm_evenings: 'peaceful evening activities, gentle nighttime experiences, relaxing dinner settings',
+  fast_paced: 'pack maximum activities per day, efficient routing between attractions, high-energy schedule',
+  slow_travel: 'fewer locations visited slowly with deeper immersion, quality over quantity, linger at each spot',
+  less_walking: 'minimize walking distances, prefer transport between locations, accessible and nearby venues',
+  avoid_hectic: 'generous time gaps between activities, buffer time, no rushed transitions, breathing room',
+  scenic_moments: 'prioritize visually stunning viewpoints, scenic routes, panoramic locations, photo opportunities',
+  local_food: 'authentic local eateries, street food, regional cuisine specialties, food markets and food walks',
+  cafe_hopping: 'scenic cafés, local coffee culture, artisan tea houses, cozy reading/relaxation spots',
+  cultural: 'museums, heritage sites, local art scenes, traditional performances, historical walking tours',
+  less_crowded: 'hidden gems over tourist hotspots, off-beat attractions, less touristy alternatives, quiet neighborhoods',
+  quiet_spots: 'secluded places, peaceful corners, secret gardens, locals-only spots away from crowds',
+  shopping: 'local markets, artisan shops, boutiques, souvenir shopping opportunities, craft bazaars',
+  nightlife: 'vibrant evening entertainment, bars, live music venues, night markets, cultural evening shows',
+  luxury: 'premium experiences, high-end dining, exclusive access, VIP treatments, luxury amenities',
+  adventure: 'thrilling outdoor activities, sports, trekking, nature exploration, adrenaline experiences',
+  leisure: 'spa sessions, pool time, beach lounging, slow reading spots, hammock/relaxation time',
+  romantic: 'intimate settings, couples experiences, candlelight dining, scenic couple-friendly spots',
+  cozy_evenings: 'warm intimate evening settings, fireside dining, sunset views from cozy venues, quiet nights',
+  memorable: 'once-in-a-lifetime experiences, unique local activities, unforgettable signature moments',
+  photogenic: 'instagram-worthy locations, architectural beauty, golden hour spots, scenic backdrops',
+  sunset_sunrise: 'golden hour experiences, sunrise viewpoints, sunset watching locations, magic-hour activities',
+  peaceful: 'serene environments, nature sounds, meditation-friendly spaces, low-noise tranquil areas',
+  surprise_me: 'creatively balance the itinerary with unexpected hidden gems, unique local discoveries, and a fresh mix of experiences the traveler would not find on their own',
+};
+
+/**
+ * Human-readable labels for vibe IDs (used in prompt text)
+ */
+const VIBE_LABELS = {
+  slow_mornings: 'Slow Peaceful Mornings',
+  relaxed_afternoons: 'Relaxed Afternoons',
+  calm_evenings: 'Calm Evenings',
+  fast_paced: 'Fast-Paced Exploration',
+  slow_travel: 'Slow Travel Pace',
+  less_walking: 'Less Walking',
+  avoid_hectic: 'Avoid Hectic Days',
+  scenic_moments: 'Scenic Moments',
+  local_food: 'More Local Food',
+  cafe_hopping: 'Café Hopping',
+  cultural: 'Cultural Experiences',
+  less_crowded: 'Less Crowded Places',
+  quiet_spots: 'Quiet Hidden Spots',
+  shopping: 'Shopping Friendly',
+  nightlife: 'Nightlife Energy',
+  luxury: 'Luxury Experiences',
+  adventure: 'Adventure-Filled Days',
+  leisure: 'Leisure & Relaxation',
+  romantic: 'Romantic Atmosphere',
+  cozy_evenings: 'Cozy Evenings',
+  memorable: 'Memorable Experiences',
+  photogenic: 'Photogenic Places',
+  sunset_sunrise: 'Sunset/Sunrise Moments',
+  peaceful: 'Peaceful Environment',
+  surprise_me: 'Surprise Me',
+};
+
+/**
  * Build the prompt for Gemini AI
  * @param {Object} params - Trip parameters
  * @returns {string} Formatted prompt
  */
-function buildPrompt({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced' }) {
+function buildPrompt({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced', selectedVibes = [], customTripIntent = '' }) {
   const budgetInfo = BUDGET_TIERS[budget];
   const styleInfo = TRAVEL_STYLES[travelStyle];
 
@@ -182,6 +245,12 @@ Respond ONLY with valid JSON. No markdown, no code blocks, no explanations befor
 
 REMEMBER: Be extremely brief for activity descriptions (5-10 words). But write rich, sensory prose for narrativeParagraph, wowMoment, and day narratives. Generate content for ALL ${duration} days.`;
 
+  // ─── Trip Vibe Preferences Section ──────────────────────────
+  let vibeSection = '';
+  if ((selectedVibes && selectedVibes.length > 0) || (customTripIntent && customTripIntent.trim())) {
+    vibeSection = buildVibeSection(selectedVibes, customTripIntent);
+  }
+
   let originSection = '';
   if (hasOrigins && travelersArray && travelersArray.length > 0) {
     const travelersWithOrigins = travelersArray.filter(t => t.origin && t.origin.trim());
@@ -196,7 +265,69 @@ Use this context to ensure the itinerary duration, pacing, and arrival pacing ar
     }
   }
 
-  return promptText + originSection;
+  return promptText + vibeSection + originSection;
+}
+
+/**
+ * Build the Trip Vibe Preferences prompt section.
+ * Uses a weighted priority system:
+ *   1. Custom text + Surprise Me → strongest weight
+ *   2. First 3 selected vibes → medium priority ("primary vibes")
+ *   3. Remaining vibes → supporting signals
+ * @param {string[]} selectedVibes - Ordered array of selected vibe IDs
+ * @param {string} customTripIntent - Free-text emotional input
+ * @returns {string} Prompt section
+ */
+function buildVibeSection(selectedVibes = [], customTripIntent = '') {
+  if (selectedVibes.length === 0 && !customTripIntent.trim()) return '';
+
+  let section = `
+
+TRIP VIBE PREFERENCES (treat as weighted emotional priorities, NOT rigid rules):
+The traveler wants their trip to FEEL a certain way. Shape the itinerary's pacing, activity selection, timing, and atmosphere accordingly.
+`;
+
+  if (selectedVibes.length > 0) {
+    // Split into primary (first 3) and supporting (rest) for weighted priority
+    const primaryVibes = selectedVibes.slice(0, 3);
+    const supportingVibes = selectedVibes.slice(3);
+
+    if (primaryVibes.length > 0) {
+      section += `\nPRIMARY VIBES (highest priority — shape the core feel of each day):`;
+      primaryVibes.forEach(vibeId => {
+        const label = VIBE_LABELS[vibeId] || vibeId;
+        const desc = VIBE_DESCRIPTIONS[vibeId] || '';
+        section += `\n- ${label}: ${desc}`;
+      });
+    }
+
+    if (supportingVibes.length > 0) {
+      section += `\n\nSUPPORTING VIBES (secondary — weave in where natural):`;
+      supportingVibes.forEach(vibeId => {
+        const label = VIBE_LABELS[vibeId] || vibeId;
+        const desc = VIBE_DESCRIPTIONS[vibeId] || '';
+        section += `\n- ${label}: ${desc}`;
+      });
+    }
+  }
+
+  if (customTripIntent && customTripIntent.trim()) {
+    section += `\n\nTRAVELER'S OWN WORDS (treat as highest priority intent):\n"${customTripIntent.trim()}"`;
+  }
+
+  section += `
+
+CRITICAL VIBE RULES:
+1. These are EMOTIONAL SIGNALS, not hard constraints. Adjust pacing, timing, and atmosphere — do NOT add artificial delays or waste time.
+2. If vibes seem contradictory (e.g., Nightlife Energy + Slow Mornings), balance intelligently (e.g., schedule late morning starts on days after nightlife). NEVER reject or warn about contradictions.
+3. SAFETY: The itinerary must ALWAYS remain practical, realistic, and travel-efficient. Vibes influence atmosphere, NOT logistics.
+   - "Slow mornings" ≠ wasting half the day. It means a gentler start with scenic breakfast, not idle time.
+   - "Adventure" ≠ exhausting unsafe schedule. It means thrilling but well-paced activities.
+   - "Nightlife" ≠ unsafe areas. It means vibrant, popular evening spots.
+   - "Luxury" ≠ budget-breaking. It means premium touches within the stated budget tier.
+4. Vibes should make the trip feel EMOTIONALLY different, not structurally broken.`;
+
+  return section;
 }
 
 /**
@@ -287,7 +418,7 @@ function extractJSON(raw) {
  * @param {Object} params - Trip input parameters
  * @returns {Object} Parsed trip data as JSON
  */
-async function generateTrip({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced' }) {
+async function generateTrip({ destination, duration, budget, travelStyle, travelers = 1, travelersArray = [], hasOrigins = false, optimizeFor = 'balanced', selectedVibes = [], customTripIntent = '' }) {
   const MAX_RETRIES = 2;
 
   const model = genAI.getGenerativeModel({
@@ -298,7 +429,7 @@ async function generateTrip({ destination, duration, budget, travelStyle, travel
     },
   });
 
-  const prompt = buildPrompt({ destination, duration, budget, travelStyle, travelers, travelersArray, hasOrigins, optimizeFor });
+  const prompt = buildPrompt({ destination, duration, budget, travelStyle, travelers, travelersArray, hasOrigins, optimizeFor, selectedVibes, customTripIntent });
 
   let lastError;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {

@@ -1,0 +1,508 @@
+/* ═══════════════════════════════════════════════════════════════
+   ✨ Trip Vibe Preferences — Step Styles
+   Uses existing --wiz-* CSS custom properties from TripWizard.css
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Preset Chips Row ────────────────────────────────────────── */
+.vibe-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.vibe-preset-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 24px;
+  border: 1.5px solid var(--wiz-border);
+  background: var(--wiz-surface);
+  color: var(--wiz-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.vibe-preset-chip:hover {
+  border-color: rgba(20, 184, 166, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.1);
+}
+
+.vibe-preset-chip.active {
+  border-color: var(--wiz-teal);
+  background: var(--wiz-teal-dim);
+  color: var(--wiz-teal);
+  box-shadow: 0 4px 16px rgba(20, 184, 166, 0.15);
+}
+
+.vibe-preset-emoji {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ─── Section Label ───────────────────────────────────────────── */
+.vibe-section-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wiz-muted);
+  margin-bottom: 14px;
+  margin-top: 4px;
+}
+
+/* ─── Soft Suggestion ─────────────────────────────────────────── */
+.vibe-soft-suggestion {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--wiz-muted);
+  font-weight: 400;
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+/* ─── Vibe Cards Grid ─────────────────────────────────────────── */
+.vibe-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.vibe-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid var(--wiz-border);
+  background: var(--wiz-surface);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.vibe-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  opacity: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(20, 184, 166, 0.08), transparent 70%);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.vibe-card:hover {
+  border-color: rgba(20, 184, 166, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.vibe-card:hover::before {
+  opacity: 1;
+}
+
+.vibe-card:focus-visible {
+  outline: 2px solid var(--wiz-teal);
+  outline-offset: 2px;
+}
+
+.vibe-card.selected {
+  border-color: var(--wiz-teal);
+  background: rgba(20, 184, 166, 0.04);
+  box-shadow: 0 0 0 1px var(--wiz-teal), 0 6px 20px rgba(20, 184, 166, 0.12);
+  transform: translateY(-1px) scale(1.02);
+}
+
+:root.dark .vibe-card.selected {
+  background: rgba(20, 184, 166, 0.08);
+  box-shadow: 0 0 0 1px var(--wiz-teal), 0 6px 24px rgba(20, 184, 166, 0.18);
+}
+
+.vibe-card.selected::before {
+  opacity: 1;
+}
+
+.vibe-card-emoji {
+  font-size: 22px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.vibe-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vibe-card-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--wiz-text);
+  line-height: 1.3;
+}
+
+.vibe-card-desc {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--wiz-muted);
+  line-height: 1.3;
+  opacity: 0.85;
+}
+
+/* ─── Surprise Me Card ────────────────────────────────────────── */
+.vibe-card.surprise-me {
+  border-style: dashed;
+  border-color: rgba(20, 184, 166, 0.35);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.03), rgba(56, 189, 248, 0.03));
+}
+
+.vibe-card.surprise-me:hover {
+  border-color: var(--wiz-teal);
+  border-style: solid;
+}
+
+.vibe-card.surprise-me.selected {
+  border-style: solid;
+  border-color: var(--wiz-teal);
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.06), rgba(56, 189, 248, 0.06));
+}
+
+/* ─── Show More Accordion ─────────────────────────────────────── */
+.vibe-show-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--wiz-teal);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.vibe-show-more-btn:hover {
+  background: var(--wiz-teal-dim);
+}
+
+.vibe-show-more-arrow {
+  display: inline-flex;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 12px;
+}
+
+.vibe-show-more-arrow.expanded {
+  transform: rotate(180deg);
+}
+
+.vibe-more-section {
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+}
+
+.vibe-more-section.expanded {
+  max-height: 1200px;
+  opacity: 1;
+}
+
+/* ─── AI Hint Toast ───────────────────────────────────────────── */
+.vibe-ai-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--wiz-teal-dim);
+  border: 1px solid rgba(20, 184, 166, 0.15);
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
+.vibe-ai-hint-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.vibe-ai-hint-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--wiz-teal);
+  line-height: 1.5;
+}
+
+:root.dark .vibe-ai-hint {
+  background: rgba(20, 184, 166, 0.08);
+  border-color: rgba(20, 184, 166, 0.12);
+}
+
+/* ─── Guardrail Warning ───────────────────────────────────────── */
+.vibe-guardrail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  margin-top: 12px;
+}
+
+.vibe-guardrail-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #D97706;
+  line-height: 1.4;
+}
+
+:root.dark .vibe-guardrail {
+  background: rgba(251, 191, 36, 0.06);
+  border-color: rgba(251, 191, 36, 0.15);
+}
+
+:root.dark .vibe-guardrail-text {
+  color: #FBBF24;
+}
+
+/* ─── Custom Intent Textarea ──────────────────────────────────── */
+.vibe-custom-section {
+  margin-top: 28px;
+}
+
+.vibe-custom-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--wiz-text);
+  margin-bottom: 6px;
+}
+
+.vibe-custom-helper {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--wiz-muted);
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.vibe-custom-textarea {
+  width: 100%;
+  min-height: 88px;
+  max-height: 160px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1.5px solid var(--wiz-border);
+  background: var(--wiz-surface);
+  color: var(--wiz-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.vibe-custom-textarea::placeholder {
+  color: var(--wiz-muted);
+  font-weight: 300;
+  opacity: 0.7;
+}
+
+.vibe-custom-textarea:focus {
+  border-color: var(--wiz-teal);
+  box-shadow: 0 0 0 3px var(--wiz-teal-dim);
+}
+
+.vibe-char-count {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--wiz-muted);
+  text-align: right;
+  margin-top: 6px;
+  opacity: 0.7;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.vibe-char-count.warning {
+  color: #D97706;
+  opacity: 1;
+}
+
+/* ─── Selection Count Badge ───────────────────────────────────── */
+.vibe-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--wiz-teal-dim);
+  border: 1px solid rgba(20, 184, 166, 0.15);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--wiz-teal);
+  margin-bottom: 16px;
+}
+
+/* ─── Summary Personality Section (in StepSummary) ────────────── */
+.vibe-personality {
+  grid-column: 1 / -1;
+  background: var(--wiz-surface);
+  border: 1px solid var(--wiz-border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.vibe-personality-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--wiz-muted);
+  margin-bottom: 10px;
+}
+
+.vibe-personality-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.vibe-personality-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 16px;
+  background: var(--wiz-teal-dim);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--wiz-teal);
+}
+
+.vibe-personality-sentence {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--wiz-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ─── Skip Link ───────────────────────────────────────────────── */
+.wiz-skip-link {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--wiz-muted);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 8px;
+  transition: color 0.2s;
+  opacity: 0.8;
+  width: 100%;
+}
+
+.wiz-skip-link:hover {
+  color: var(--wiz-text);
+  opacity: 1;
+}
+
+/* ─── Responsive: Mobile ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .vibe-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .vibe-card {
+    padding: 12px 14px;
+  }
+
+  .vibe-card-emoji {
+    font-size: 20px;
+  }
+
+  .vibe-card-label {
+    font-size: 12.5px;
+  }
+
+  .vibe-card-desc {
+    font-size: 11px;
+  }
+
+  .vibe-presets {
+    gap: 8px;
+  }
+
+  .vibe-preset-chip {
+    padding: 9px 14px;
+    font-size: 12.5px;
+  }
+
+  .vibe-custom-textarea {
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
+@media (max-width: 480px) {
+  .vibe-card {
+    padding: 11px 12px;
+    gap: 8px;
+  }
+
+  .vibe-preset-chip {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ─── Reduced Motion Support ──────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vibe-card,
+  .vibe-preset-chip,
+  .vibe-show-more-arrow,
+  .vibe-more-section {
+    transition: none !important;
+  }
+
+  .vibe-card:hover,
+  .vibe-card.selected {
+    transform: none !important;
+  }
+}

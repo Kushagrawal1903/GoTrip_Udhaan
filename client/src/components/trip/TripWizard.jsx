@@ -4,10 +4,11 @@ import { Link } from 'react-router-dom';
 import ThemeToggle from '../layout/ThemeToggle';
 import { useAuth } from '../../context/AuthContext';
 import StepDuration from '../wizard/StepDuration';
+import StepVibes, { ALL_VIBES, generatePersonalitySentence } from '../wizard/StepVibes';
 import './TripWizard.css';
 
 /* ─── Constants ──────────────────────────────────────────────── */
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 const DESTINATIONS = [
   { emoji: '🏖️', name: 'Goa', tags: 'Beach · Party' },
@@ -91,6 +92,7 @@ const GLOW_POSITIONS = [
   { g1: { top: -50, right: -150 }, g2: { bottom: -100, left: -100 } },
   { g1: { top: -120, right: 50 }, g2: { bottom: 50, left: -120 } },
   { g1: { top: 0, right: -80 }, g2: { bottom: -80, left: 50 } },
+  { g1: { top: -60, right: -120 }, g2: { bottom: -40, left: -60 } },
   { g1: { top: -80, right: -50 }, g2: { bottom: 0, left: -80 } },
 ];
 
@@ -293,6 +295,16 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
   const travelersWithOrigins = Array.isArray(tripData.travelers) ? tripData.travelers.filter(t => t.origin && t.origin.trim().length > 0) : [];
   const hasOrigins = travelersWithOrigins.length > 0;
 
+  const hasVibes = tripData.selectedVibes && tripData.selectedVibes.length > 0;
+  const personalitySentence = hasVibes ? generatePersonalitySentence(tripData.selectedVibes) : '';
+  const vibeItems = hasVibes
+    ? tripData.selectedVibes.map(id => {
+        if (id === 'surprise_me') return { emoji: '✨', label: 'Surprise Me' };
+        const found = ALL_VIBES.find(v => v.id === id);
+        return found ? { emoji: found.emoji, label: found.label } : null;
+      }).filter(Boolean)
+    : [];
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show">
       <motion.div variants={itemVariants} className="wiz-eyebrow">All set!</motion.div>
@@ -329,6 +341,26 @@ function StepSummary({ tripData, loading, error, onGenerate }) {
           <div className="wiz-summary-label">Budget</div>
           <div className="wiz-summary-value">{budgetName}</div>
         </div>
+
+        {/* ─── Your Trip Personality ─── */}
+        {hasVibes && (
+          <div className="vibe-personality">
+            <div className="vibe-personality-label">Your Trip Personality</div>
+            <div className="vibe-personality-chips">
+              {vibeItems.slice(0, 6).map(item => (
+                <span key={item.label} className="vibe-personality-chip">
+                  <span aria-hidden="true">{item.emoji}</span> {item.label}
+                </span>
+              ))}
+              {vibeItems.length > 6 && (
+                <span className="vibe-personality-chip">+{vibeItems.length - 6} more</span>
+              )}
+            </div>
+            {personalitySentence && (
+              <div className="vibe-personality-sentence">{personalitySentence}</div>
+            )}
+          </div>
+        )}
       </motion.div>
 
       <motion.div variants={itemVariants}>
@@ -379,6 +411,8 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
     ],
     style: null,
     budget: null,
+    selectedVibes: [],
+    customTripIntent: '',
   });
 
   useEffect(() => {
@@ -405,7 +439,8 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
       case 1: return Array.isArray(tripData.travelers) && tripData.travelers.length > 0 && tripData.travelers.every(t => t.name.trim().length > 0);
       case 2: return tripData.style !== null;
       case 3: return tripData.budget !== null;
-      case 4: return true;
+      case 4: return true; // Vibes step — always optional
+      case 5: return true;
       default: return false;
     }
   };
@@ -432,6 +467,8 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
       budget: tripData.budget,
       travelStyle: tripData.style,
       travelers: tripData.travelers,
+      selectedVibes: tripData.selectedVibes,
+      customTripIntent: tripData.customTripIntent,
     });
   };
 
@@ -478,6 +515,14 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
       case 3:
         return <StepBudget budget={tripData.budget} onUpdate={updateTripData} />;
       case 4:
+        return (
+          <StepVibes
+            selectedVibes={tripData.selectedVibes}
+            customTripIntent={tripData.customTripIntent}
+            onUpdate={updateTripData}
+          />
+        );
+      case 5:
         return (
           <StepSummary
             tripData={tripData}
@@ -578,15 +623,27 @@ export default function TripWizard({ onGenerate, loading = false, error = '' }) 
           >
             {renderStep()}
 
-            {/* Continue button (not on step 5) */}
+            {/* Continue button (not on summary step) */}
             {currentStep < TOTAL_STEPS - 1 && (
-              <button
-                className="wiz-continue-btn"
-                onClick={goNext}
-                disabled={!canContinue()}
-              >
-                Continue <span className="wiz-continue-arrow">→</span>
-              </button>
+              <>
+                <button
+                  className="wiz-continue-btn"
+                  onClick={goNext}
+                  disabled={!canContinue()}
+                >
+                  Continue <span className="wiz-continue-arrow">→</span>
+                </button>
+                {/* Skip link on vibes step */}
+                {currentStep === 4 && (
+                  <button
+                    className="wiz-skip-link"
+                    onClick={goNext}
+                    type="button"
+                  >
+                    Skip personalization →
+                  </button>
+                )}
+              </>
             )}
           </motion.div>
         </AnimatePresence>

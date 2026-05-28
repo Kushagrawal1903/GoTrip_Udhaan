@@ -72,6 +72,15 @@ const tripSchema = new mongoose.Schema(
             enum: ['cheapest', 'fastest', 'balanced', 'comfort'],
             default: 'balanced'
         },
+        // ─── FEATURE: Trip Vibe Preferences ─────────────────────
+        tripPreferences: {
+            selectedVibes: [String],
+            customTripIntent: {
+                type: String,
+                maxlength: 500,
+                default: ''
+            }
+        },
         hasOrigins: { type: Boolean, default: false },
         // Store the complete AI-generated trip data as a flexible object
         tripData: {
